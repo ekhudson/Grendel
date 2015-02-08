@@ -1,0 +1,13 @@
+﻿<Properties>
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="MonoDevelop.Default" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Third Party\Grendel\Code\Editor\CustomEditors\UserInputEditor.cs">
+    <Files>
+      <File FileName="Assets\Third Party\Grendel\Code\Utility\Console\Console.cs" Line="93" Column="3" />
+      <File FileName="Assets\Third Party\Grendel\Code\Editor\CustomEditors\UserInputEditor.cs" Line="15" Column="43" />
+    </Files>
+  </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore />
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+</Properties>
