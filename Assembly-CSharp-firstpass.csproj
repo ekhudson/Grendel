@@ -135,8 +135,11 @@
  <Reference Include="UnityEngine.UI">
  <HintPath>C:/Program Files (x86)/Unity/Editor/Data/UnityExtensions/Unity/GUISystem/4.6.2/UnityEngine.UI.dll</HintPath>
  </Reference>
+ <Reference Include="Grendel">
+ <HintPath>C:/Users/Elliot/Unity Projects/Grendel/Assets/Code/Grendel.dll</HintPath>
+ </Reference>
  <Reference Include="XInputDotNetPure">
- <HintPath>C:/Users/Gaspar Home/Documents/Elliot/Unity Projects/Grendel/Assets/Plugins/XInputDotNetPure.dll</HintPath>
+ <HintPath>C:/Users/Elliot/Unity Projects/Grendel/Assets/Plugins/XInputDotNetPure.dll</HintPath>
  </Reference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
