@@ -56,7 +56,7 @@ namespace Grendel.Editor
 
             GameObject gameObject = (GameObject)EditorUtility.InstanceIDToObject(instanceID);
 
-            sCurrentChildCount = gameObject.GetComponentsInChildren<Transform>().Length - 1;
+            sCurrentChildCount = gameObject.transform.childCount;
             sCurrentParentCount = gameObject.GetComponentsInParent<Transform>().Length - 1;
 
             Rect iconPosition = new Rect(position);
@@ -95,6 +95,8 @@ namespace Grendel.Editor
                 EditorGUIUtility.IconContent("ViewToolOrbit On") :
                 EditorGUIUtility.IconContent("ViewToolOrbit");
 
+            sHideButtonContent.tooltip = "Hide / Show Object";
+
             testHideShow = GUI.Toggle(iconPosition, testHideShow, sHideButtonContent, sHideButtonStyle);
             
             GUI.contentColor = Color.white;
@@ -109,18 +111,24 @@ namespace Grendel.Editor
                 return;
             }
 
+            sTreeViewStyle.normal.textColor = Color.gray;
 
             GUI.Label(iconPosition, "├", sTreeViewStyle);
 
-            if (sCurrentParentCount <= 1)
+            if (sCurrentIndentAmount <= 1)
             {
                 return;
             }
 
-            iconPosition.x -= (7 * sCurrentParentCount);
+            float xPos = iconPosition.x;
 
-            GUI.Label(iconPosition, "│", sTreeViewStyle);
-          
+            sTreeViewStyle.normal.textColor = Color.gray;
+
+            for (int i = 1; i < sCurrentIndentAmount; i++)
+            {
+                iconPosition.x = (xPos - (sIndentWidth * i)) + 1f;
+                GUI.Label(iconPosition, "¦", sTreeViewStyle);
+            }          
         }
 
         private static void DrawPreview(GameObject gameObject, Rect position)
@@ -128,9 +136,9 @@ namespace Grendel.Editor
             position.x -= sIconWidth;
             position.width = sIconWidth;
 
-            GUIContent preview = EditorGUIUtility.ObjectContent(gameObject, gameObject.GetType());
+            GUIContent preview = AssetPreview.GetMiniThumbnail(gameObject);
 
-            if (preview.image != null)
+            if (preview.image != null && gameObject.transform.childCount == 0)
             {
                 GUI.DrawTexture(position, preview.image);
             }
