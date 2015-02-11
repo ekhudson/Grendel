@@ -28,7 +28,8 @@ namespace Grendel.Editor
         private static int sCurrentChildCount = 0;
         private static int sCurrentIndentAmount = 0;
         private static int sPreviousIndentAmount = 0;
-
+        private static Vector2 sTreeViewShadowOffset = new Vector2(1, 1);
+        
         static GrendelHierarchyView()
         {
             EditorApplication.hierarchyWindowItemOnGUI += OnHierarchyWindowItemOnGUI;
@@ -55,6 +56,8 @@ namespace Grendel.Editor
             }
 
             GameObject gameObject = (GameObject)EditorUtility.InstanceIDToObject(instanceID);
+
+            //GUI.Button(position, gameObject.GetType().ToString());
 
             sCurrentChildCount = gameObject.transform.childCount;
             sCurrentParentCount = gameObject.GetComponentsInParent<Transform>().Length - 1;
@@ -105,11 +108,17 @@ namespace Grendel.Editor
         private static void DrawTreeBranch(GameObject gameObject, Rect iconPosition)
         {
             iconPosition.x -= sTreeViewOffset;
+            Rect shadowPos = new Rect(iconPosition);
+            shadowPos.center += sTreeViewShadowOffset;
 
             if (sCurrentParentCount <= 0)
             {
                 return;
             }
+
+            sTreeViewStyle.normal.textColor = Color.white;
+
+            GUI.Label(shadowPos, "├", sTreeViewStyle);
 
             sTreeViewStyle.normal.textColor = Color.gray;
 
@@ -127,6 +136,17 @@ namespace Grendel.Editor
             for (int i = 1; i < sCurrentIndentAmount; i++)
             {
                 iconPosition.x = (xPos - (sIndentWidth * i)) + 1f;
+
+                shadowPos = new Rect(iconPosition);
+
+                shadowPos.center += sTreeViewShadowOffset;
+
+                sTreeViewStyle.normal.textColor = Color.white;
+
+                GUI.Label(shadowPos, "¦", sTreeViewStyle);
+
+                sTreeViewStyle.normal.textColor = Color.gray;
+
                 GUI.Label(iconPosition, "¦", sTreeViewStyle);
             }          
         }
@@ -136,7 +156,9 @@ namespace Grendel.Editor
             position.x -= sIconWidth;
             position.width = sIconWidth;
 
-            GUIContent preview = AssetPreview.GetMiniThumbnail(gameObject);
+            GUIContent preview = new GUIContent();
+
+            preview.image = AssetPreview.GetMiniTypeThumbnail(gameObject.GetType());
 
             if (preview.image != null && gameObject.transform.childCount == 0)
             {
