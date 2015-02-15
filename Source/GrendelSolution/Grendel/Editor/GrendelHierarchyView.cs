@@ -29,6 +29,13 @@ namespace Grendel.Editor
         private static int sCurrentIndentAmount = 0;
         private static int sPreviousIndentAmount = 0;
         private static Vector2 sTreeViewShadowOffset = new Vector2(1, 1);
+        private const string kTreeItemTop = "└";
+        private const string kTreeItemBottom = "┌";
+        private const string kTreeOuterBranch = "¦";
+        private static Rect sPreviousItemBranchRect = new Rect();
+        private static Transform[] sCurrentParents = new Transform[0];
+        private static Transform sCurrentTransform = null;
+        private static List<GameObject> sCurrentSelectedObjects = new List<GameObject>(); 
         
         static GrendelHierarchyView()
         {
@@ -57,10 +64,13 @@ namespace Grendel.Editor
 
             GameObject gameObject = (GameObject)EditorUtility.InstanceIDToObject(instanceID);
 
-            //GUI.Button(position, gameObject.GetType().ToString());
+            sCurrentTransform = gameObject.transform;
+            sCurrentParents = gameObject.GetComponentsInParent<Transform>();
 
             sCurrentChildCount = gameObject.transform.childCount;
-            sCurrentParentCount = gameObject.GetComponentsInParent<Transform>().Length - 1;
+            sCurrentParentCount = sCurrentParents.Length - 1;
+            
+            //GUI.Label(position, "------------------" + sCurrentParentCount.ToString());
 
             Rect iconPosition = new Rect(position);
             iconPosition.width = sIconWidth;
@@ -107,22 +117,27 @@ namespace Grendel.Editor
 
         private static void DrawTreeBranch(GameObject gameObject, Rect iconPosition)
         {
-            iconPosition.x -= sTreeViewOffset;
-            Rect shadowPos = new Rect(iconPosition);
-            shadowPos.center += sTreeViewShadowOffset;
-
             if (sCurrentParentCount <= 0)
             {
                 return;
             }
 
-            sTreeViewStyle.normal.textColor = Color.white;
+            iconPosition.x -= sTreeViewOffset;
+            Rect shadowPos = new Rect(iconPosition);
+            shadowPos.center += sTreeViewShadowOffset;
 
-            GUI.Label(shadowPos, "├", sTreeViewStyle);
+            Color currentTreeColour = GrendelSelection.SelectedGameObjects.Contains(gameObject.transform.parent.gameObject) ? Color.cyan : Color.white;
 
-            sTreeViewStyle.normal.textColor = Color.gray;
+            GrendelGUI.ShadedLabel(iconPosition, kTreeItemTop, currentTreeColour, Color.gray, sTreeViewShadowOffset, sTreeViewStyle);
 
-            GUI.Label(iconPosition, "├", sTreeViewStyle);
+            if (sPreviousIndentAmount <= sCurrentIndentAmount && sPreviousIndentAmount > 0)
+            {
+                
+
+                GrendelGUI.ShadedLabel(sPreviousItemBranchRect, kTreeItemBottom, currentTreeColour, Color.gray, sTreeViewShadowOffset, sTreeViewStyle);
+            }
+
+            sPreviousItemBranchRect = new Rect(iconPosition);
 
             if (sCurrentIndentAmount <= 1)
             {
@@ -131,24 +146,20 @@ namespace Grendel.Editor
 
             float xPos = iconPosition.x;
 
-            sTreeViewStyle.normal.textColor = Color.gray;
-
             for (int i = 1; i < sCurrentIndentAmount; i++)
             {
                 iconPosition.x = (xPos - (sIndentWidth * i)) + 1f;
 
-                shadowPos = new Rect(iconPosition);
-
-                shadowPos.center += sTreeViewShadowOffset;
-
-                sTreeViewStyle.normal.textColor = Color.white;
-
-                GUI.Label(shadowPos, "¦", sTreeViewStyle);
-
-                sTreeViewStyle.normal.textColor = Color.gray;
-
-                GUI.Label(iconPosition, "¦", sTreeViewStyle);
-            }          
+                if (gameObject.transform.GetSiblingIndex() == gameObject.transform.parent.childCount - 1 &&
+                    i == 1)
+                {
+                    GrendelGUI.ShadedLabel(iconPosition, "•", Color.white, Color.gray, sTreeViewShadowOffset, sTreeViewStyle);
+                }
+                else if (gameObject.transform)
+                {
+                    GrendelGUI.ShadedLabel(iconPosition, kTreeOuterBranch, Color.white, Color.gray, sTreeViewShadowOffset, sTreeViewStyle);
+                }
+            }
         }
 
         private static void DrawPreview(GameObject gameObject, Rect position)
