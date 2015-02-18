@@ -33,7 +33,7 @@ namespace Grendel.Editor
         private const string kTreeItemBottom = "┌";
         private const string kTreeOuterBranch = "¦";
         private static Rect sPreviousItemBranchRect = new Rect();
-        private static Transform[] sCurrentParents = new Transform[0];
+        private static List<Transform> sCurrentParents = new List<Transform>();
         private static Transform sCurrentTransform = null;
         private static List<GameObject> sCurrentSelectedObjects = new List<GameObject>(); 
         
@@ -65,12 +65,20 @@ namespace Grendel.Editor
             GameObject gameObject = (GameObject)EditorUtility.InstanceIDToObject(instanceID);
 
             sCurrentTransform = gameObject.transform;
-            sCurrentParents = gameObject.GetComponentsInParent<Transform>();
+            sCurrentParents = new List<Transform>(gameObject.GetComponentsInParent<Transform>());
 
-            sCurrentChildCount = gameObject.transform.childCount;
-            sCurrentParentCount = sCurrentParents.Length - 1;
+            if (sCurrentParents.Contains(gameObject.transform))
+            {
+                sCurrentParents.Remove(gameObject.transform);
+            }
             
-            //GUI.Label(position, "------------------" + sCurrentParentCount.ToString());
+            sCurrentChildCount = gameObject.transform.childCount;
+            sCurrentParentCount = sCurrentParents.Count - 1;
+
+            //if (gameObject.transform.parent != null)
+            //{
+            //    GUI.Label(position, "------------------" + (gameObject.transform.GetSiblingIndex() + 1) + " / " + gameObject.transform.parent.childCount.ToString());
+            //}
 
             Rect iconPosition = new Rect(position);
             iconPosition.width = sIconWidth;
@@ -126,14 +134,22 @@ namespace Grendel.Editor
             Rect shadowPos = new Rect(iconPosition);
             shadowPos.center += sTreeViewShadowOffset;
 
-            Color currentTreeColour = GrendelSelection.SelectedGameObjects.Contains(gameObject.transform.parent.gameObject) ? Color.cyan : Color.white;
+            bool parentSelected = false;
+
+            foreach(Transform parent in sCurrentParents)
+            {
+                if (GrendelSelection.SelectedGameObjects.Contains(parent.gameObject))
+                {
+                    parentSelected = true;
+                }
+            }
+
+            Color currentTreeColour = parentSelected ? Color.cyan : Color.white;
 
             GrendelGUI.ShadedLabel(iconPosition, kTreeItemTop, currentTreeColour, Color.gray, sTreeViewShadowOffset, sTreeViewStyle);
 
             if (sPreviousIndentAmount <= sCurrentIndentAmount && sPreviousIndentAmount > 0)
             {
-                
-
                 GrendelGUI.ShadedLabel(sPreviousItemBranchRect, kTreeItemBottom, currentTreeColour, Color.gray, sTreeViewShadowOffset, sTreeViewStyle);
             }
 
@@ -148,17 +164,42 @@ namespace Grendel.Editor
 
             for (int i = 1; i < sCurrentIndentAmount; i++)
             {
-                iconPosition.x = (xPos - (sIndentWidth * i)) + 1f;
+                iconPosition.x = (xPos - (sIndentWidth * i));
 
-                if (gameObject.transform.GetSiblingIndex() == gameObject.transform.parent.childCount - 1 &&
-                    i == 1)
+                Color outerBranchColor = Color.white;
+
+                for (int j = i - 1; j < sCurrentIndentAmount; j++)
                 {
-                    GrendelGUI.ShadedLabel(iconPosition, "•", Color.white, Color.gray, sTreeViewShadowOffset, sTreeViewStyle);
+                    if (GrendelSelection.SelectedGameObjects.Contains(sCurrentParents[j].gameObject))
+                    {
+                        outerBranchColor = Color.cyan;
+                        break;
+                    }
                 }
-                else if (gameObject.transform)
-                {
-                    GrendelGUI.ShadedLabel(iconPosition, kTreeOuterBranch, Color.white, Color.gray, sTreeViewShadowOffset, sTreeViewStyle);
-                }
+
+                    if (gameObject.transform.GetSiblingIndex() == gameObject.transform.parent.childCount - 1 &&
+                        i == 1)
+                    {
+                        if (gameObject.transform.parent.parent != null && gameObject.transform.parent.GetSiblingIndex() != gameObject.transform.parent.parent.childCount - 1)
+                        {
+                            iconPosition.x += 1;
+                            GrendelGUI.ShadedLabel(iconPosition, kTreeOuterBranch, outerBranchColor, Color.gray, sTreeViewShadowOffset, sTreeViewStyle);
+                        }
+                        else
+                        {
+                            GrendelGUI.ShadedLabel(iconPosition, kTreeItemTop, currentTreeColour, Color.gray, sTreeViewShadowOffset, sTreeViewStyle);
+
+                            iconPosition.x += 9f;
+
+                            GrendelGUI.ShadedLabel(iconPosition, "–", currentTreeColour, Color.gray, sTreeViewShadowOffset, sTreeViewStyle);
+                        }
+                    }
+                    else if (gameObject.transform)
+                    {
+                        iconPosition.x += 1;
+
+                        GrendelGUI.ShadedLabel(iconPosition, kTreeOuterBranch, outerBranchColor, Color.gray, sTreeViewShadowOffset, sTreeViewStyle);
+                    }
             }
         }
 
