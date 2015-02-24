@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 
+using Grendel.Extensions;
+
 namespace Grendel.Editor
 {
     [InitializeOnLoad]
@@ -103,20 +105,28 @@ namespace Grendel.Editor
         {
             iconPosition.x += (sIndentWidth * sCurrentIndentAmount);
 
-            GUI.Toggle(iconPosition, false, string.Empty, sLockButtonStyleName);
+            bool locked = gameObject.IsLocked();
+
+            //bool locked = gameObject
+
+            locked = GUI.Toggle(iconPosition, locked, string.Empty, sLockButtonStyleName);
+
+            gameObject.SetLock(locked, false);
         }
 
         private static void DrawHideButton(GameObject gameObject, Rect iconPosition)
         {
             iconPosition.x += (sIndentWidth * sCurrentIndentAmount);
 
-            GUI.color = testHideShow ? Color.gray : Color.white;
+            GUI.contentColor = testHideShow ? Color.gray : Color.white;
 
             sHideButtonContent = testHideShow ?
                 EditorGUIUtility.IconContent("ViewToolOrbit On") :
                 EditorGUIUtility.IconContent("ViewToolOrbit");
 
             sHideButtonContent.tooltip = "Hide / Show Object";
+
+            bool active = gameObject.activeSelf;
 
             testHideShow = GUI.Toggle(iconPosition, testHideShow, sHideButtonContent, sHideButtonStyle);
             

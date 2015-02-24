@@ -20,6 +20,7 @@ namespace Grendel.Editor
         }
     }
 
+    [CustomEditor(typeof(GameObject))]
     public class GameObjectEditor : UnityEditor.Editor
     {
         private static HashSet<UnityEngine.Object> sPreviousSelectedGameObjects = new HashSet<UnityEngine.Object>();
@@ -64,6 +65,21 @@ namespace Grendel.Editor
             }
 
             return newSelection.ToArray();
+        }
+
+        public override void OnInspectorGUI()
+        {
+            if ((target as GameObject).IsLocked())
+            {
+                GUI.enabled = false;
+            }
+
+
+            base.OnInspectorGUI();
+
+            GUI.enabled = true;
+
+
         }
 
         public void OnSelectionChange()
