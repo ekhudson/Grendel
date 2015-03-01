@@ -30,15 +30,20 @@ namespace Grendel.Editor
         private static int sCurrentChildCount = 0;
         private static int sCurrentIndentAmount = 0;
         private static int sPreviousIndentAmount = 0;
+        private static int sCurrentObjectIndex = 0;
         private static Vector2 sTreeViewShadowOffset = new Vector2(1, 1);
         private const string kTreeItemTop = "└";
         private const string kTreeItemBottom = "┌";
         private const string kTreeOuterBranch = "¦";
         private const string kTreeEndOfBranch = "ˉ";
+        private static Rect sPreviousItemPosition = new Rect();
         private static Rect sPreviousItemBranchRect = new Rect();
         private static List<Transform> sCurrentParents = new List<Transform>();
         private static Transform sCurrentTransform = null;
-        private static List<GameObject> sCurrentSelectedObjects = new List<GameObject>(); 
+        private static List<GameObject> sCurrentSelectedObjects = new List<GameObject>();
+
+
+        private static Color sEvenRowColor = Color.Lerp(Color.magenta, Color.clear, 0.75f);
         
         static GrendelHierarchyView()
         {
@@ -63,6 +68,24 @@ namespace Grendel.Editor
             if (sLockButtonStyle == null)
             {
                 SetupStyles();
+            }
+
+            if (sPreviousItemPosition.y > position.y)
+            {
+                //we're back at the top of the hierarchy
+                sCurrentObjectIndex = 0;
+            }
+
+            if ((sCurrentObjectIndex & 1) != 1)
+            {
+                GUI.color = sEvenRowColor;
+
+                Rect bgRect = new Rect(position);
+                bgRect.x -= ((sCurrentIndentAmount + 1) * sIndentWidth) - 1f;
+                bgRect.width += ((sCurrentIndentAmount + 1) * sIndentWidth) - 1f;
+
+                GUI.DrawTexture(bgRect, EditorGUIUtility.whiteTexture);
+                GUI.color = Color.white;
             }
 
             GameObject gameObject = (GameObject)EditorUtility.InstanceIDToObject(instanceID);
@@ -100,6 +123,10 @@ namespace Grendel.Editor
             DrawPreview(gameObject, position);
 
             sPreviousIndentAmount = sCurrentIndentAmount;
+
+            sPreviousItemPosition = new Rect(position);
+
+            sCurrentObjectIndex++;
         }
 
         private static void DrawLockButton(GameObject gameObject, Rect iconPosition)
@@ -107,8 +134,6 @@ namespace Grendel.Editor
             iconPosition.x += (sIndentWidth * sCurrentIndentAmount);
 
             bool locked = gameObject.IsLocked();
-
-            //bool locked = gameObject
 
             locked = GUI.Toggle(iconPosition, locked, string.Empty, sLockButtonStyleName);
 
@@ -226,9 +251,15 @@ namespace Grendel.Editor
 
             SerializedObject obj = new SerializedObject(gameObject);
 
-            //preview.image =  (Texture)obj.FindProperty("m_Icon");
+            if (!obj.FindProperty("m_Icon").hasMultipleDifferentValues)
+            {
+                preview.image = AssetPreview.GetMiniThumbnail(gameObject as UnityEngine.Object);
+            }
 
-            //preview.image = AssetPreview.GetMiniTypeThumbnail(gameObject.GetType());
+            if (preview.image == null)
+            {
+                preview.image = AssetPreview.GetMiniTypeThumbnail(gameObject.GetType());
+            }
 
             if (preview.image != null && gameObject.transform.childCount == 0)
             {

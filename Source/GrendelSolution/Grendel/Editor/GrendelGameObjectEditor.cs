@@ -20,7 +20,7 @@ namespace Grendel.Editor
         }
     }
 
-    [CustomEditor(typeof(GameObject))]
+    //[CustomEditor(typeof(GameObject))]
     public class GameObjectEditor : UnityEditor.Editor
     {
         private static HashSet<UnityEngine.Object> sPreviousSelectedGameObjects = new HashSet<UnityEngine.Object>();
