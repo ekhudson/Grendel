@@ -34,6 +34,7 @@ namespace Grendel.Editor
         private const string kTreeItemTop = "└";
         private const string kTreeItemBottom = "┌";
         private const string kTreeOuterBranch = "¦";
+        private const string kTreeEndOfBranch = "ˉ";
         private static Rect sPreviousItemBranchRect = new Rect();
         private static List<Transform> sCurrentParents = new List<Transform>();
         private static Transform sCurrentTransform = null;
@@ -158,7 +159,7 @@ namespace Grendel.Editor
 
             GrendelGUI.ShadedLabel(iconPosition, kTreeItemTop, currentTreeColour, Color.gray, sTreeViewShadowOffset, sTreeViewStyle);
 
-            if (sPreviousIndentAmount <= sCurrentIndentAmount && sPreviousIndentAmount > 0)
+            if (sPreviousIndentAmount <= sCurrentIndentAmount && sPreviousIndentAmount > 0 && !(sPreviousItemBranchRect.y > iconPosition.y))
             {
                 GrendelGUI.ShadedLabel(sPreviousItemBranchRect, kTreeItemBottom, currentTreeColour, Color.gray, sTreeViewShadowOffset, sTreeViewStyle);
             }
@@ -171,10 +172,12 @@ namespace Grendel.Editor
             }
 
             float xPos = iconPosition.x;
+            float yPos = iconPosition.y;
 
             for (int i = 1; i < sCurrentIndentAmount; i++)
             {
                 iconPosition.x = (xPos - (sIndentWidth * i));
+                iconPosition.y = yPos;
 
                 Color outerBranchColor = Color.white;
 
@@ -200,8 +203,9 @@ namespace Grendel.Editor
                             GrendelGUI.ShadedLabel(iconPosition, kTreeItemTop, currentTreeColour, Color.gray, sTreeViewShadowOffset, sTreeViewStyle);
 
                             iconPosition.x += 9f;
+                            iconPosition.y += 4f;
 
-                            GrendelGUI.ShadedLabel(iconPosition, "–", currentTreeColour, Color.gray, sTreeViewShadowOffset, sTreeViewStyle);
+                            GrendelGUI.ShadedLabel(iconPosition, kTreeEndOfBranch, currentTreeColour, Color.gray, sTreeViewShadowOffset, sTreeViewStyle);
                         }
                     }
                     else if (gameObject.transform)
@@ -220,7 +224,11 @@ namespace Grendel.Editor
 
             GUIContent preview = new GUIContent();
 
-            preview.image = AssetPreview.GetMiniTypeThumbnail(gameObject.GetType());
+            SerializedObject obj = new SerializedObject(gameObject);
+
+            //preview.image =  (Texture)obj.FindProperty("m_Icon");
+
+            //preview.image = AssetPreview.GetMiniTypeThumbnail(gameObject.GetType());
 
             if (preview.image != null && gameObject.transform.childCount == 0)
             {
