@@ -20,7 +20,6 @@ namespace Grendel.Editor
         }
     }
 
-    //[CustomEditor(typeof(GameObject))]
     public class GameObjectEditor : UnityEditor.Editor
     {
         private static HashSet<UnityEngine.Object> sPreviousSelectedGameObjects = new HashSet<UnityEngine.Object>();
@@ -52,7 +51,7 @@ namespace Grendel.Editor
 
             for (int i = newSelection.Count - 1; i >= 0; i--)
             {
-                if (newSelection[i] == null)
+                if (newSelection[i] == null || (newSelection[i] as GameObject) == null)
                 {
                     newSelection.RemoveAt(i);
                     continue;
