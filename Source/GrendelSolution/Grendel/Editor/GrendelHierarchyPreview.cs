@@ -15,6 +15,7 @@ namespace Grendel.Editor
         private static GUIStyle sCustomIconStyle = null;
 
         private const float kDividerWidth = 1f;
+        private const float kBrokenPrefabOpacity = 0.50f;
 
         private static void SetupStyle()
         {
@@ -22,12 +23,18 @@ namespace Grendel.Editor
             sCustomIconStyle.alignment = TextAnchor.MiddleRight;
         }
 
+        //TODO: Look at the first component? Or at least look for some key components
+        //like camera, rigidbody, etc.
+        //Let the user pick from components on the prefab?
         internal static void DrawPreview(GameObject gameObject, Rect iconPosition, Rect rowPosition)
         {
             if (sCustomIconStyle == null)
             {
                 SetupStyle();
             }
+
+            iconPosition.x += 2f;
+            iconPosition.y -= 1f;
 
             GUIContent typeIcon = new GUIContent();
             GUIContent customIcon = new GUIContent();
@@ -62,7 +69,7 @@ namespace Grendel.Editor
 
                     case PrefabType.DisconnectedPrefabInstance:
 
-                        GUI.color = Color.Lerp(Color.white, Color.clear, 0.45f);
+                        GUI.color = Color.Lerp(Color.white, Color.clear, kBrokenPrefabOpacity);
                         typeIcon = sPrefabNormalIcon;
 
                     break;

@@ -13,9 +13,9 @@ namespace Grendel.Editor
     {
         internal const float kIconWidth = 16f;
         internal const float kIconBufferWidth = 2f;
-        internal const float kIconRightMargin = 8f;
-        
+        internal const float kIconRightMargin = 8f;        
         internal const float kIndentWidth = 14f;
+        internal const float kHierarchySidebarWidth = 44f;
 
         private static GUIStyle sItemLabelStyle;
         private static GUIStyle sSelectionRectStyle;
@@ -32,6 +32,7 @@ namespace Grendel.Editor
         private static int sPreviousIndentAmount = 0;
         private static int sCurrentObjectIndex = 0;
         private static int sTotalCurrentObjectCount = 0;
+        private static Color sCurrentRowColor = GrendelEditorGUIUtility.CurrentSkinViewColor;
 
         private static Rect sPreviousItemPosition = new Rect();
 
@@ -102,17 +103,7 @@ namespace Grendel.Editor
             //if (gameObject.transform.parent != null)
             //{
             //    GUI.Label(position, "------------------" + sCurrentObjectIndex.ToString());
-            //}
-
-            Rect iconPosition = new Rect(position);
-            iconPosition.width = kIconWidth;
-            iconPosition.x = (position.width - kIconWidth) + kIconRightMargin;
-
-            DrawLockButton(gameObject, iconPosition);
-
-            iconPosition.x -= (kIconWidth + kIconBufferWidth);
-
-            DrawHideButton(gameObject, iconPosition);
+            //}           
 
             GrendelHierarchyTreeView.DrawTreeBranch(gameObject, position, sCurrentIndentAmount, sPreviousIndentAmount);
 
@@ -123,11 +114,37 @@ namespace Grendel.Editor
 
             GrendelHierarchyPreview.DrawPreview(gameObject, previewPosition, position);
 
+            Rect sideBarPosition = new Rect(position);
+            sideBarPosition.width += (sCurrentIndentAmount + 1) * kIndentWidth;
+
+            DrawSidebar(sideBarPosition);
+
+            Rect iconPosition = new Rect(position);
+            iconPosition.width = kIconWidth;
+            iconPosition.x = (position.width - kIconWidth) + kIconRightMargin;          
+
+            DrawLockButton(gameObject, iconPosition);
+
+            iconPosition.x -= (kIconWidth + kIconBufferWidth);
+
+            DrawHideButton(gameObject, iconPosition);
+
             sPreviousIndentAmount = sCurrentIndentAmount;
 
             sPreviousItemPosition = new Rect(position);
 
             sCurrentObjectIndex++;
+        }
+
+        private static void DrawSidebar(Rect position)
+        {
+            GUI.color = (sCurrentObjectIndex & 1) != 1 ? GrendelEditorGUIUtility.CurrentSkinViewColor : sOddRowColor;
+
+            position.x = position.width - kHierarchySidebarWidth;
+            position.width = kHierarchySidebarWidth;
+
+            GUI.DrawTexture(position, EditorGUIUtility.whiteTexture);
+            GUI.color = Color.white;
         }
 
         //TODO: repaint the hierarchy window on new object / delete object in order to

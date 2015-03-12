@@ -8,82 +8,82 @@ using Grendel.Extensions;
 
 namespace Grendel.Editor
 {
-    [InitializeOnLoad]
-    public class GameObjectEditorInitializer
-    {
-        static GameObjectEditorInitializer()
-        {
-            if (EditorApplication.update != GameObjectEditor.Update)
-            {
-                EditorApplication.update += GameObjectEditor.Update;
-            }
-        }
-    }
+    //[InitializeOnLoad]
+    //public class GameObjectEditorInitializer
+    //{
+    //    static GameObjectEditorInitializer()
+    //    {
+    //        if (EditorApplication.update != GameObjectEditor.Update)
+    //        {
+    //            EditorApplication.update += GameObjectEditor.Update;
+    //        }
+    //    }
+    //}
 
-    public class GameObjectEditor : UnityEditor.Editor
-    {
-        private static HashSet<UnityEngine.Object> sPreviousSelectedGameObjects = new HashSet<UnityEngine.Object>();
+    //public class GameObjectEditor : UnityEditor.Editor
+    //{
+    //    private static HashSet<UnityEngine.Object> sPreviousSelectedGameObjects = new HashSet<UnityEngine.Object>();
 
-        public static void Update()
-        {
-            // Object[] objects = FilterObjects(Selection.objects);
-            Selection.objects = FilterObjects(Selection.objects);
-
-
-            //if (sPreviousSelectedGameObjects.Count > 0 && Selection.objects.Length > 0)
-            //{
-            //    if (!sPreviousSelectedGameObjects.SetEquals(objects))
-            //    {
-            //        Selection.objects = objects;
-            //        sPreviousSelectedGameObjects = new HashSet<Object>(objects);
-            //    }
-            //}
-            //else if (Selection.objects.Length > 0)
-            //{
-            //    Selection.objects = objects;
-            //    sPreviousSelectedGameObjects = new HashSet<Object>(objects);
-            //}
-        }
-
-        private static UnityEngine.Object[] FilterObjects(UnityEngine.Object[] objects)
-        {
-            List<UnityEngine.Object> newSelection = new List<UnityEngine.Object>(Selection.objects);
-
-            for (int i = newSelection.Count - 1; i >= 0; i--)
-            {
-                if (newSelection[i] == null || (newSelection[i] as GameObject) == null)
-                {
-                    newSelection.RemoveAt(i);
-                    continue;
-                }
-
-                if ((newSelection[i] as GameObject).IsLocked()) //filter out locked gameobjects
-                {
-                    newSelection.RemoveAt(i);
-                }
-            }
-
-            return newSelection.ToArray();
-        }
-
-        public override void OnInspectorGUI()
-        {
-            if ((target as GameObject).IsLocked())
-            {
-                GUI.enabled = false;
-            }
+    //    public static void Update()
+    //    {
+    //        // Object[] objects = FilterObjects(Selection.objects);
+    //        Selection.objects = FilterObjects(Selection.objects);
 
 
-            base.OnInspectorGUI();
+    //        //if (sPreviousSelectedGameObjects.Count > 0 && Selection.objects.Length > 0)
+    //        //{
+    //        //    if (!sPreviousSelectedGameObjects.SetEquals(objects))
+    //        //    {
+    //        //        Selection.objects = objects;
+    //        //        sPreviousSelectedGameObjects = new HashSet<Object>(objects);
+    //        //    }
+    //        //}
+    //        //else if (Selection.objects.Length > 0)
+    //        //{
+    //        //    Selection.objects = objects;
+    //        //    sPreviousSelectedGameObjects = new HashSet<Object>(objects);
+    //        //}
+    //    }
 
-            GUI.enabled = true;
+    //    private static UnityEngine.Object[] FilterObjects(UnityEngine.Object[] objects)
+    //    {
+    //        List<UnityEngine.Object> newSelection = new List<UnityEngine.Object>(Selection.objects);
+
+    //        for (int i = newSelection.Count - 1; i >= 0; i--)
+    //        {
+    //            if (newSelection[i] == null || (newSelection[i] as GameObject) == null)
+    //            {
+    //                newSelection.RemoveAt(i);
+    //                continue;
+    //            }
+
+    //            if ((newSelection[i] as GameObject).IsLocked()) //filter out locked gameobjects
+    //            {
+    //                newSelection.RemoveAt(i);
+    //            }
+    //        }
+
+    //        return newSelection.ToArray();
+    //    }
+
+    //    public override void OnInspectorGUI()
+    //    {
+    //        if ((target as GameObject).IsLocked())
+    //        {
+    //            GUI.enabled = false;
+    //        }
 
 
-        }
+    //        base.OnInspectorGUI();
 
-        public void OnSelectionChange()
-        {
-            Debug.Log("HEY");
-        }
-    }
+    //        GUI.enabled = true;
+
+
+    //    }
+
+    //    public void OnSelectionChange()
+    //    {
+    //        Debug.Log("HEY");
+    //    }
+    //}
 }
