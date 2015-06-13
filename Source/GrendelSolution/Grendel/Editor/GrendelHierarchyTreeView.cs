@@ -88,10 +88,9 @@ namespace Grendel.Editor
                     }
                 }
 
-                if (gameObject.transform.GetSiblingIndex() == gameObject.transform.parent.childCount - 1 &&
-                    i == 1)
+                if ((gameObject.transform.GetSiblingIndex() == gameObject.transform.parent.childCount - 1) && (i == 1))
                 {
-                    if (gameObject.transform.parent.parent != null && gameObject.transform.parent.GetSiblingIndex() != gameObject.transform.parent.parent.childCount - 1)
+                    if (gameObject.transform.parent.parent != null && gameObject.transform.parent.GetSiblingIndex() + 1 != gameObject.transform.parent.parent.childCount)
                     {
                         position.x += 1;
                         GrendelGUI.ShadedLabel(position, kTreeOuterBranch, outerBranchColor, sTreeBranchShadowColor, sTreeViewShadowOffset, sTreeViewStyle);
@@ -106,11 +105,19 @@ namespace Grendel.Editor
                         GrendelGUI.ShadedLabel(position, kTreeEndOfBranch, currentTreeColour, sTreeBranchShadowColor, sTreeViewShadowOffset, sTreeViewStyle);
                     }
                 }
-                else if (gameObject.transform)
+                else if (gameObject.transform && GrendelHierarchyView.CurrentParents[i] != null && 
+                         GrendelHierarchyView.CurrentParents[i].transform.parent.parent != null &&
+                         GrendelHierarchyView.CurrentParents[i].transform.parent != null)
                 {
-                    position.x += 1;
+                    GUI.Label(position, new GUIContent("X", string.Format("{0} is {1} of {2}",GrendelHierarchyView.CurrentParents[i].name,  gameObject.transform.parent.GetSiblingIndex() + 1, gameObject.transform.parent.parent.childCount)), sTreeViewStyle);
 
-                    GrendelGUI.ShadedLabel(position, kTreeOuterBranch, outerBranchColor, sTreeBranchShadowColor, sTreeViewShadowOffset, sTreeViewStyle);
+
+                    if (GrendelHierarchyView.CurrentParents[i].transform.parent.GetSiblingIndex() + 1 != GrendelHierarchyView.CurrentParents[i].transform.parent.parent.childCount)
+                    {
+                        position.x += 1;
+
+                        GrendelGUI.ShadedLabel(position, kTreeOuterBranch, outerBranchColor, sTreeBranchShadowColor, sTreeViewShadowOffset, sTreeViewStyle);
+                    }
                 }
             }
         }
