@@ -103,7 +103,7 @@ namespace Grendel.Editor
             //if (gameObject.transform.parent != null)
             //{
             //    GUI.Label(position, "------------------" + sCurrentObjectIndex.ToString());
-            //}           
+            //} 
 
             GrendelHierarchyTreeView.DrawTreeBranch(gameObject, position, sCurrentIndentAmount, sPreviousIndentAmount);
 
@@ -128,6 +128,14 @@ namespace Grendel.Editor
             iconPosition.x -= (kIconWidth + kIconBufferWidth);
 
             DrawHideButton(gameObject, iconPosition);
+
+            Rect layerPreviewPosition = new Rect(iconPosition);
+            layerPreviewPosition.x -= (kIconWidth) + (kIconBufferWidth * 3);
+            layerPreviewPosition.x += sCurrentIndentAmount * kIndentWidth;
+
+            //TODO: Figure out how to draw the layer for the NEXT object so that selection rect draws on top
+
+            GrendelHierarchyLayerPreview.DrawLayerPreview(gameObject.layer, layerPreviewPosition);
 
             sPreviousIndentAmount = sCurrentIndentAmount;
 
@@ -201,11 +209,10 @@ namespace Grendel.Editor
         {
             iconPosition.x += (kIndentWidth * sCurrentIndentAmount);
 
+            //TODO: Change 'true' to an actual check for 'hidden' status
             GUI.contentColor = true ? Color.gray : Color.white;
 
-            sHideButtonContent = true ?
-                EditorGUIUtility.IconContent("ViewToolOrbit On") :
-                EditorGUIUtility.IconContent("ViewToolOrbit");
+            sHideButtonContent = true ? EditorGUIUtility.IconContent("ViewToolOrbit On") : EditorGUIUtility.IconContent("ViewToolOrbit");
 
             sHideButtonContent.tooltip = "Hide / Show Object";
 
