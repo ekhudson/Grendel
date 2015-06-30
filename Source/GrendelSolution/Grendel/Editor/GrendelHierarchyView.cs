@@ -46,6 +46,7 @@ namespace Grendel.Editor
         internal static int CurrentParentCount { get { return sCurrentParentCount;  } }
         internal static List<Transform> CurrentParents { get { return sCurrentParents;  } }
 
+        internal static GrendelLayerPreviewPopupState CurrentLayerPopupState = null;
 
         static GrendelHierarchyView()
         {
@@ -95,7 +96,7 @@ namespace Grendel.Editor
             {
                 //we're back at the top of the hierarchy
                 sTotalCurrentObjectCount = sCurrentObjectIndex;
-                sCurrentObjectIndex = 0;
+                sCurrentObjectIndex = 0;               
             }
 
             ColorNextRow(position);
@@ -130,18 +131,29 @@ namespace Grendel.Editor
             DrawHideButton(gameObject, iconPosition);
 
             Rect layerPreviewPosition = new Rect(iconPosition);
-            layerPreviewPosition.x -= (kIconWidth) + (kIconBufferWidth * 3);
+            layerPreviewPosition.x -= (kIconWidth * 2) + (kIconBufferWidth * 2);
             layerPreviewPosition.x += sCurrentIndentAmount * kIndentWidth;
+            layerPreviewPosition.width = kIconWidth * 2;
 
             //TODO: Figure out how to draw the layer for the NEXT object so that selection rect draws on top
 
-            GrendelHierarchyLayerPreview.DrawLayerPreview(gameObject.layer, layerPreviewPosition);
+            GrendelHierarchyLayerPreview.DrawLayerPreview(gameObject, layerPreviewPosition);
 
             sPreviousIndentAmount = sCurrentIndentAmount;
 
             sPreviousItemPosition = new Rect(position);
 
             sCurrentObjectIndex++;
+
+            //Check if we're at the end
+            if (sCurrentObjectIndex >= sTotalCurrentObjectCount)
+            {
+                if (CurrentLayerPopupState != null)
+                {
+                    GrendelHierarchyLayerPreview.DrawPopup(CurrentLayerPopupState);
+                    HandleUtility.Repaint();                   
+                }
+            }
         }
 
         private static void DrawSidebar(Rect position)

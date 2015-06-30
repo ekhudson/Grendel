@@ -17,7 +17,7 @@ namespace Grendel.Editor
         private static Rect sPreviousItemBranchRect = new Rect();
         private static Color sTreeBranchShadowColor = Color.white;
         private static Color STreeBranchNormalColor = Color.gray;
-        private static Color sTreeBranchSelectedColor = Color.blue;
+        private static Color sTreeBranchSelectedColor = new Color(0.15f, 0.45f, 1f, 1.0f);
 
         private static void SetupStyle()
         {
@@ -57,9 +57,17 @@ namespace Grendel.Editor
 
             if (previousIndentAmount <= currentIndentAmount && previousIndentAmount > 0 && !(sPreviousItemBranchRect.y > position.y))
             {
-                Rect pos = new Rect(sPreviousItemBranchRect);
-                pos.y -= 1;
-                GrendelGUI.ShadedLabel(pos, kTreeItemBottom, currentTreeColour, sTreeBranchShadowColor, sTreeViewShadowOffset, sTreeViewStyle);
+                if (gameObject.transform.GetSiblingIndex() == 0 && gameObject.transform.parent.GetSiblingIndex() + 1 == gameObject.transform.parent.parent.childCount)
+                {
+                    //do nothing
+                }
+                else
+                {
+                    Rect pos = new Rect(sPreviousItemBranchRect);
+                    pos.y -= 1;
+                    GrendelGUI.ShadedLabel(pos, kTreeItemBottom, currentTreeColour, sTreeBranchShadowColor, sTreeViewShadowOffset, sTreeViewStyle);
+                }
+
             }
 
             sPreviousItemBranchRect = new Rect(position);
@@ -79,41 +87,15 @@ namespace Grendel.Editor
 
                 Color outerBranchColor = STreeBranchNormalColor;
 
-                for (int j = i - 1; j < currentIndentAmount; j++)
+                if (GrendelHierarchyView.CurrentParents[i] != null)
                 {
-                    if (GrendelSelection.SelectedGameObjects.Contains(GrendelHierarchyView.CurrentParents[j].gameObject))
+                    if ((i - 1 >= 0) && (GrendelHierarchyView.CurrentParents[i - 1].parent != null && (GrendelHierarchyView.CurrentParents[i - 1].GetSiblingIndex() + 1 < GrendelHierarchyView.CurrentParents[i - 1].parent.childCount)))
                     {
-                        outerBranchColor = STreeBranchNormalColor;
-                        break;
-                    }
-                }
+                        if (GrendelSelection.IsTransformAffectedBySelection(GrendelHierarchyView.CurrentParents[i - 1]))
+                        {
+                            outerBranchColor = sTreeBranchSelectedColor;
+                        }
 
-                if ((gameObject.transform.GetSiblingIndex() == gameObject.transform.parent.childCount - 1) && (i == 1))
-                {
-                    if (gameObject.transform.parent.parent != null && gameObject.transform.parent.GetSiblingIndex() + 1 != gameObject.transform.parent.parent.childCount)
-                    {
-                        position.x += 1;
-                        GrendelGUI.ShadedLabel(position, kTreeOuterBranch, outerBranchColor, sTreeBranchShadowColor, sTreeViewShadowOffset, sTreeViewStyle);
-                    }
-                    else
-                    {
-                        GrendelGUI.ShadedLabel(position, kTreeItemTop, currentTreeColour, sTreeBranchShadowColor, sTreeViewShadowOffset, sTreeViewStyle);
-
-                        position.x += 9f;
-                        position.y += 4f;
-
-                        GrendelGUI.ShadedLabel(position, kTreeEndOfBranch, currentTreeColour, sTreeBranchShadowColor, sTreeViewShadowOffset, sTreeViewStyle);
-                    }
-                }
-                else if (gameObject.transform && GrendelHierarchyView.CurrentParents[i] != null && 
-                         GrendelHierarchyView.CurrentParents[i].transform.parent.parent != null &&
-                         GrendelHierarchyView.CurrentParents[i].transform.parent != null)
-                {
-                    GUI.Label(position, new GUIContent("X", string.Format("{0} is {1} of {2}",GrendelHierarchyView.CurrentParents[i].name,  gameObject.transform.parent.GetSiblingIndex() + 1, gameObject.transform.parent.parent.childCount)), sTreeViewStyle);
-
-
-                    if (GrendelHierarchyView.CurrentParents[i].transform.parent.GetSiblingIndex() + 1 != GrendelHierarchyView.CurrentParents[i].transform.parent.parent.childCount)
-                    {
                         position.x += 1;
 
                         GrendelGUI.ShadedLabel(position, kTreeOuterBranch, outerBranchColor, sTreeBranchShadowColor, sTreeViewShadowOffset, sTreeViewStyle);

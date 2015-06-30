@@ -98,7 +98,7 @@ namespace Grendel.Editor
 
             if (customIcon != null)
             {
-                rowPosition.x -= ((GrendelHierarchyView.kIconWidth + GrendelHierarchyView.kIconBufferWidth) * 3) + GrendelHierarchyView.kIconRightMargin + kDividerWidth;
+                rowPosition.x -= ((GrendelHierarchyView.kIconWidth + GrendelHierarchyView.kIconBufferWidth) * 4) + GrendelHierarchyView.kIconRightMargin + kDividerWidth;
                 GUI.Label(rowPosition, customIcon.image, sCustomIconStyle);
 
                 rowPosition.x = rowPosition.x + (rowPosition.width);

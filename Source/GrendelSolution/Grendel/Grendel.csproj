@@ -59,12 +59,15 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Editor\GrendelColor.cs" />
     <Compile Include="Editor\GrendelEditorGUIUtility.cs" />
     <Compile Include="Editor\GrendelGameObjectEditor.cs" />
     <Compile Include="Editor\GrendelGUI.cs" />
+    <Compile Include="Editor\GrendelHierarchyLayerPreview.cs" />
     <Compile Include="Editor\GrendelHierarchyPreview.cs" />
     <Compile Include="Editor\GrendelHierarchyTreeView.cs" />
     <Compile Include="Editor\GrendelHierarchyView.cs" />
+    <Compile Include="Editor\GrendelLayerColours.cs" />
     <Compile Include="Editor\GrendelSelection.cs" />
     <Compile Include="Extensions\GrendelGameObjectExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

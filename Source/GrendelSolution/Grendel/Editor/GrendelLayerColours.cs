@@ -63,7 +63,8 @@ namespace Grendel.Editor
                 GUILayout.EndHorizontal();
             }
 
-            EditorGUILayout.SelectableLabel(sLayerColors[sLayerColors.Length - 1].ToString());
+            sTempColor = EditorGUILayout.ColorField(sTempColor);
+            EditorGUILayout.SelectableLabel(sTempColor.ToString());
 
             GUILayout.EndScrollView();
         }
