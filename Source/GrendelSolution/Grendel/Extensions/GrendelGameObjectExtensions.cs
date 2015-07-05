@@ -19,7 +19,7 @@ namespace Grendel.Extensions
             {
                 if (!gameObject.IsLocked())
                 {
-                    gameObject.hideFlags |= (HideFlags.NotEditable | HideFlags.HideInInspector);
+                    gameObject.hideFlags |= (HideFlags.NotEditable);
 
                     if (recursive && gameObject.transform.childCount > 0)
                     {
@@ -27,14 +27,14 @@ namespace Grendel.Extensions
 
                         foreach (Transform child in children)
                         {
-                            child.gameObject.hideFlags |= (HideFlags.NotEditable | HideFlags.HideInInspector);
+                            child.gameObject.hideFlags |= (HideFlags.NotEditable);
                         }
                     }
                 }
             }
             else if (gameObject.IsLocked())
             {
-                gameObject.hideFlags &= ~(HideFlags.NotEditable | HideFlags.HideInInspector);
+                gameObject.hideFlags &= ~(HideFlags.NotEditable);
 
                 if (recursive && gameObject.transform.childCount > 0)
                 {
@@ -42,10 +42,12 @@ namespace Grendel.Extensions
 
                     foreach (Transform child in children)
                     {
-                        child.gameObject.hideFlags &= ~(HideFlags.NotEditable | ~HideFlags.HideInInspector);
+                        child.gameObject.hideFlags &= ~(HideFlags.NotEditable);
                     }
                 }
             }
+
+            SceneView.RepaintAll();
         }
     }
 }

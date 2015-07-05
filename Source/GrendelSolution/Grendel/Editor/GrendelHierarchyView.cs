@@ -46,8 +46,6 @@ namespace Grendel.Editor
         internal static int CurrentParentCount { get { return sCurrentParentCount;  } }
         internal static List<Transform> CurrentParents { get { return sCurrentParents;  } }
 
-        internal static GrendelLayerPreviewPopupState CurrentLayerPopupState = null;
-
         static GrendelHierarchyView()
         {
             EditorApplication.hierarchyWindowItemOnGUI += OnHierarchyWindowItemOnGUI;
@@ -103,7 +101,7 @@ namespace Grendel.Editor
 
             //if (gameObject.transform.parent != null)
             //{
-            //    GUI.Label(position, "------------------" + sCurrentObjectIndex.ToString());
+            //    GUI.Label(position, "------------------" + sTotalCurrentObjectCount.ToString());
             //} 
 
             GrendelHierarchyTreeView.DrawTreeBranch(gameObject, position, sCurrentIndentAmount, sPreviousIndentAmount);
@@ -135,8 +133,6 @@ namespace Grendel.Editor
             layerPreviewPosition.x += sCurrentIndentAmount * kIndentWidth;
             layerPreviewPosition.width = kIconWidth * 2;
 
-            //TODO: Figure out how to draw the layer for the NEXT object so that selection rect draws on top
-
             GrendelHierarchyLayerPreview.DrawLayerPreview(gameObject, layerPreviewPosition);
 
             sPreviousIndentAmount = sCurrentIndentAmount;
@@ -144,16 +140,6 @@ namespace Grendel.Editor
             sPreviousItemPosition = new Rect(position);
 
             sCurrentObjectIndex++;
-
-            //Check if we're at the end
-            if (sCurrentObjectIndex >= sTotalCurrentObjectCount)
-            {
-                if (CurrentLayerPopupState != null)
-                {
-                    GrendelHierarchyLayerPreview.DrawPopup(CurrentLayerPopupState);
-                    HandleUtility.Repaint();                   
-                }
-            }
         }
 
         private static void DrawSidebar(Rect position)
@@ -213,7 +199,7 @@ namespace Grendel.Editor
 
             if (locked != gameObject.IsLocked())
             {
-                gameObject.SetLock(locked, false);
+                gameObject.SetLock(locked, true);
             }
         }
 
