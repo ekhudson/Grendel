@@ -4,13 +4,23 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 
-namespace Grendel.Editor
+namespace Grendel.GrendelEditor
 {
     [InitializeOnLoad]
     public static class GrendelSelection
     {
         private static List<GameObject> sCurrentlySelectedObjects = new List<GameObject>();
         private static List<Transform> sAllAffectedObjects = new List<Transform>();
+
+        static GrendelSelection()
+        {
+            EditorApplication.update += OnEditorUpdate;
+        }
+
+        public static void OnEditorUpdate()
+        {
+            sCurrentlySelectedObjects = new List<GameObject>(Selection.gameObjects);
+        }
 
         public static List<GameObject> SelectedGameObjects
         {
@@ -34,16 +44,6 @@ namespace Grendel.Editor
             {
                 return false;
             }
-        }
-
-        static GrendelSelection()
-        {
-            EditorApplication.update += OnEditorUpdate;
-        }
-
-        public static void OnEditorUpdate()
-        {
-            sCurrentlySelectedObjects = new List<GameObject>(Selection.gameObjects);
         }
     }
 }
