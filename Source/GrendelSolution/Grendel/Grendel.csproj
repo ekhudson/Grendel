@@ -66,6 +66,7 @@
     <Compile Include="Editor\GrendelGUI.cs" />
     <Compile Include="Editor\GrendelHierarchy.cs" />
     <Compile Include="Editor\GrendelHierarchyLayerPreview.cs" />
+    <Compile Include="Editor\GrendelHierarchyPreferences.cs" />
     <Compile Include="Editor\GrendelHierarchyPreview.cs" />
     <Compile Include="Editor\GrendelHierarchyTreeView.cs" />
     <Compile Include="Editor\GrendelHierarchyView.cs" />

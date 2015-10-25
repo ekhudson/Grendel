@@ -40,7 +40,6 @@ namespace Grendel.GrendelEditor
             position.x -= kTreeViewOffset;
             position.y -= 2;
 
-
             bool parentSelected = false;
 
             foreach (Transform parent in GrendelHierarchyView.CurrentParents)
