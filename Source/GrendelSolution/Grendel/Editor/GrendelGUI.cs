@@ -3,7 +3,7 @@
 using UnityEngine;
 using UnityEditor;
 
-namespace Grendel.Editor
+namespace Grendel.GrendelEditor
 {
     internal static class GrendelGUI
     {

@@ -6,7 +6,7 @@ using UnityEditor;
 
 using Grendel.Extensions;
 
-namespace Grendel.Editor
+namespace Grendel.GrendelEditor
 {
     [InitializeOnLoad]
     public class GrendelHierarchyView
@@ -22,6 +22,7 @@ namespace Grendel.Editor
 
         private static string sLockButtonStyleName = "IN LockButton";
         private static GUIStyle sLockButtonStyle = null;
+        private static GUIStyle sLockedLabelStyle = null;
         
         private static GUIStyle sHideButtonStyle = null;
         private static GUIContent sHideButtonContent = null;
@@ -32,16 +33,21 @@ namespace Grendel.Editor
         private static int sPreviousIndentAmount = 0;
         private static int sCurrentObjectIndex = 0;
         private static int sTotalCurrentObjectCount = 0;
-        private static Color sCurrentRowColor = GrendelEditorGUIUtility.CurrentSkinViewColor;
+        private static Color sEvenRowColor = GrendelEditorGUIUtility.CurrentSkinViewColor;
 
         private static Rect sPreviousItemPosition = new Rect();
+        private static Rect sCurrentItemPosition = new Rect();
 
         private static List<Transform> sCurrentParents = new List<Transform>();
         private static Transform sCurrentTransform = null;
+        private static GrendelObjectData sCurrentObjectData = null;
         private static List<GameObject> sCurrentSelectedObjects = new List<GameObject>();
         
         private static Color sOddRowColor = Color.Lerp(Color.magenta, GrendelEditorGUIUtility.CurrentSkinViewColor , 0.95f);
         private static Color sLockedLabelColor = Color.Lerp(Color.yellow, GrendelEditorGUIUtility.CurrentSkinViewColor, 0.45f);
+        private static Color sSelectionColor = new Color(0.15f, 0.45f, 1f, 1.0f);
+        private static GUIContent sVisibleContent = null;
+        private static GUIContent sInvisibleContent = null;
 
         internal static int CurrentParentCount { get { return sCurrentParentCount;  } }
         internal static List<Transform> CurrentParents { get { return sCurrentParents;  } }
@@ -65,16 +71,52 @@ namespace Grendel.Editor
             }
         }
 
+        private static Color CurrentRowColor
+        {
+            get
+            {
+                if (GrendelSelection.SelectedGameObjects.Contains(sCurrentTransform.gameObject))
+                {
+                    //TODO: Figure out why this doesn't return gray when the hierarchy window is out of focus. Does unity think ALL hierarchy windows are always in focus?
+                    if (EditorWindow.GetWindowWithRect<EditorWindow>(sCurrentItemPosition).Equals(EditorWindow.focusedWindow))
+                    {
+                        return sSelectionColor;
+                    }
+                    else
+                    {
+                        return Color.gray;
+                    }                    
+                }
+                else
+                {
+                    if ((sCurrentObjectIndex & 1) == 1)
+                    {
+                        return sOddRowColor;
+                    }
+                    else
+                    {
+                        return sEvenRowColor;
+                    }
+                }
+            }
+        }
+
         private static void SetupStyles()
         {
             sItemLabelStyle = new GUIStyle(EditorStyles.label);
 
-            sSelectionRectStyle = "SelectionRect";
+            sSelectionRectStyle = GrendelStyles.SelectionRect;
 
             sLockButtonStyle = sLockButtonStyleName;
 
-            sHideButtonStyle = new GUIStyle(EditorStyles.whiteLabel);
+            sHideButtonStyle = new GUIStyle(GUIStyle.none);
             sHideButtonStyle.fontSize = (int)kIconWidth;
+            sHideButtonStyle.alignment = TextAnchor.MiddleCenter;
+            sVisibleContent = new GUIContent(GrendelEditorIcons.EyeOpen);
+            sInvisibleContent = new GUIContent(GrendelEditorIcons.EyeClosed);
+
+            sLockedLabelStyle = new GUIStyle(GUI.skin.label);
+            sLockedLabelStyle.fontStyle = FontStyle.Bold;
         }
 
         private static void OnHierarchyWindowItemOnGUI(int instanceID, Rect position)
@@ -93,10 +135,15 @@ namespace Grendel.Editor
                 return;
             }
 
-            sCurrentTransform = gameObject.transform;
-            sCurrentParents = new List<Transform>(gameObject.GetComponentsInParent<Transform>());
+            //TODO: Figure out how to see if the name of the gameobject is being edited. It looks really bad right now if it is.
 
-            if (sCurrentParents.Contains(gameObject.transform))
+            sCurrentObjectData = GrendelHierarchy.EnsureObjectHasGrendelData(gameObject);
+
+            sCurrentItemPosition = new Rect(position);
+            sCurrentTransform = gameObject.transform;
+            sCurrentParents = new List<Transform>(gameObject.GetComponentsInParent<Transform>(true));
+
+            if (sCurrentParents.Count > 0 && sCurrentParents.Contains(gameObject.transform))
             {
                 sCurrentParents.Remove(gameObject.transform);
             }
@@ -115,7 +162,7 @@ namespace Grendel.Editor
 
             //if (gameObject.transform.parent != null)
             //{
-            //    GUI.Label(position, "------------------" + sTotalCurrentObjectCount.ToString());
+            //    GUI.Label(position, "------------------" + EditorWindow.GetWindowWithRect<EditorWindow>(sCurrentItemPosition).ToString());
             //} 
 
             GrendelHierarchyTreeView.DrawTreeBranch(gameObject, position, sCurrentIndentAmount, sPreviousIndentAmount);
@@ -134,13 +181,13 @@ namespace Grendel.Editor
 
             Rect iconPosition = new Rect(position);
             iconPosition.width = kIconWidth;
-            iconPosition.x = (position.width - kIconWidth) + kIconRightMargin;          
+            iconPosition.x = (position.width - kIconWidth) + kIconRightMargin;
 
-            DrawLockButton(gameObject, iconPosition);
+            DrawLockButton(gameObject, iconPosition);            
 
             iconPosition.x -= (kIconWidth + kIconBufferWidth);
 
-            DrawHideButton(gameObject, iconPosition);
+            DrawHideButton(sCurrentObjectData, iconPosition);
 
             Rect layerPreviewPosition = new Rect(iconPosition);
             layerPreviewPosition.x -= (kIconWidth * 2) + (kIconBufferWidth * 2);
@@ -198,41 +245,74 @@ namespace Grendel.Editor
 
         private static void DrawLockButton(GameObject gameObject, Rect iconPosition)
         {
-            iconPosition.x += (kIndentWidth * sCurrentIndentAmount);
-
-            bool locked = gameObject.IsLocked();
-
-            if (locked)
+            if (sCurrentObjectData == null)
             {
-                sLockButtonStyle.normal.textColor = Color.yellow;
+                return;
             }
 
-            locked = GUI.Toggle(iconPosition, locked, string.Empty, sLockButtonStyle);
+            iconPosition.x += (kIndentWidth * sCurrentIndentAmount);
+
+            bool locked = sCurrentObjectData.IsLocked;
+
+            if (iconPosition.Contains(Event.current.mousePosition))
+            {
+                GUI.color = GrendelColor.ModifyAlpha(sLockedLabelColor, 0.5f);
+                GUI.DrawTexture(sCurrentItemPosition, EditorGUIUtility.whiteTexture, ScaleMode.StretchToFill);
+                HandleUtility.Repaint();
+                GUI.color = Color.white;
+            }
+
+            if (!locked && Event.current.type == EventType.Repaint)
+            {
+                GUI.enabled = false;
+                sLockButtonStyle.Draw(iconPosition, false, false, false, false);
+                GUI.enabled = true;
+            }
+
+            locked = GUI.Toggle(iconPosition, locked, string.Empty, locked ? sLockButtonStyle : GUIStyle.none);         
 
             sLockButtonStyle.normal.textColor = Color.gray;
 
-            if (locked != gameObject.IsLocked())
+            if (locked != sCurrentObjectData.IsLocked)
             {
-                gameObject.SetLock(locked, true);
+                sCurrentObjectData.SetLock(locked);
             }
+
+            GUI.color = Color.white;
         }
 
-        private static void DrawHideButton(GameObject gameObject, Rect iconPosition)
+        private static Color sSubHiddenColor = Color.gray;
+        private const float kSubHiddenAlpha = 0.50f;
+
+        private static void DrawHideButton(GrendelObjectData obj, Rect iconPosition)
         {
             iconPosition.x += (kIndentWidth * sCurrentIndentAmount);
 
-            //TODO: Change 'true' to an actual check for 'hidden' status
-            GUI.contentColor = true ? Color.gray : Color.white;
+            bool hidden = obj.IsHidden;
 
-            sHideButtonContent = true ? EditorGUIUtility.IconContent("ViewToolOrbit On") : EditorGUIUtility.IconContent("ViewToolOrbit");
+            sHideButtonContent = new GUIContent(hidden ? sInvisibleContent : sVisibleContent);
 
             sHideButtonContent.tooltip = "Hide / Show Object";
 
-            bool active = gameObject.activeSelf;
+            Color previousGUIColor = GUI.color;
 
-            bool something = GUI.Toggle(iconPosition, true, sHideButtonContent, sHideButtonStyle);
-            
-            GUI.contentColor = Color.white;
+            if (!obj.gameObject.activeInHierarchy)
+            {
+                sSubHiddenColor.a = kSubHiddenAlpha;
+                GUI.color = sSubHiddenColor;
+            }
+
+            hidden = GUI.Toggle(iconPosition, hidden, sHideButtonContent, sHideButtonStyle);
+
+            if (hidden != obj.IsHidden)
+            {
+                obj.SetHidden(hidden);
+            }
+
+            if (!obj.gameObject.activeInHierarchy)
+            {
+                GUI.color = previousGUIColor;
+            }
         }
     }
 }

@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEditor;
 using UnityEditorInternal;
 
-namespace Grendel.Editor
+namespace Grendel.GrendelEditor
 {
     internal static class GrendelHierarchyLayerPreview
     {
@@ -16,10 +16,12 @@ namespace Grendel.Editor
         internal static GrendelLayerPreviewPopupState CurrentPopupState = null;
         internal static LayerSelectPopupWindow sPopupWindow = null;
 
-        private const string kButtonText = "▼";
+        private const string kButtonText = ""; //"▼";
         private const string kCheckMarkText = "✔";
+        private const string kLayerTooltipPretext = "Layer: ";
         private const float kLayerCheckMarkWidth = 16f;
         private const float kLayerEntryHeight = 18f;
+        private const float kHeightFudge = 1f;        
 
         internal static void DrawLayerPreview(GameObject obj, Rect iconPosition)
         {
@@ -29,14 +31,16 @@ namespace Grendel.Editor
                 sLabelStyle.fontSize = 9;
                 sLabelStyle.alignment = TextAnchor.MiddleLeft;
 
-                sButtonStyle = new GUIStyle(EditorStyles.miniButton);
+                sButtonStyle = new GUIStyle(GrendelStyles.DropDownStyle);
                 sButtonStyle.fontSize = 9;
                 sButtonStyle.alignment = TextAnchor.MiddleRight;
                 sButtonStyle.margin = sLabelStyle.margin;
-                sButtonStyle.padding = sLabelStyle.padding;
+                sButtonStyle.padding = sLabelStyle.padding;               
 
+                sButtonStyle.fixedHeight = iconPosition.height - 1f;
                 sSelectionRectStyle = new GUIStyle("selectionRect");                
             }
+
 
             int layerPreviewControlID = GUIUtility.GetControlID(FocusType.Passive, iconPosition);
             GrendelLayerPreviewPopupState previewState = (GrendelLayerPreviewPopupState)GUIUtility.GetStateObject(typeof(GrendelLayerPreviewPopupState), layerPreviewControlID);
@@ -56,7 +60,7 @@ namespace Grendel.Editor
                 shortName = shortName.Remove(3);
             }
 
-            GUIContent labelContent = new GUIContent(shortName, layerName);
+            GUIContent labelContent = new GUIContent(shortName, kLayerTooltipPretext + layerName);
 
             Color previousColor = GUI.color;
             GUI.color = Color.Lerp(GrendelLayerColours.GetLayerColor(obj.layer), GrendelEditorGUIUtility.CurrentSkinViewColor, 0.35f);
@@ -203,6 +207,8 @@ namespace Grendel.Editor
                     {
                         returnLayer = LayerMask.NameToLayer(sLayerNames[i]);
                         currentEvent.Use();
+                        state.IsExpanded = false;
+                        sPopupWindow.Close();
                     }
                 }
 

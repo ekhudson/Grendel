@@ -2,7 +2,7 @@
 using UnityEngine;
 using UnityEditor;
 
-namespace Grendel.Editor
+namespace Grendel.GrendelEditor
 {
     internal class GrendelLayerColours
     {

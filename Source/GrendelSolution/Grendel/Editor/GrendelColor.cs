@@ -2,7 +2,7 @@
 
 using UnityEngine;
 
-namespace Grendel.Editor
+namespace Grendel.GrendelEditor
 {
     internal static class GrendelColor
     {

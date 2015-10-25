@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEditor;
 using UnityEditorInternal;
 
-namespace Grendel.Editor
+namespace Grendel.GrendelEditor
 {
     internal static class GrendelHierarchyPreview
     {
@@ -15,12 +15,16 @@ namespace Grendel.Editor
         private static GUIContent sPrefabModelIcon = EditorGUIUtility.IconContent("PrefabModel Icon");
 
         private static GUIStyle sCustomIconStyle = null;
+        private static Color sDisabledIconColor = Color.gray;
 
         private const float kDividerWidth = 1f;
         private const float kBrokenPrefabOpacity = 0.50f;
+        private const float kDisabledIconOpacity = 0.50f;
 
         private static void SetupStyle()
         {
+            sDisabledIconColor.a = kDisabledIconOpacity;
+
             sCustomIconStyle = new GUIStyle(GUI.skin.label);
             sCustomIconStyle.alignment = TextAnchor.MiddleRight;
         }
@@ -38,6 +42,7 @@ namespace Grendel.Editor
             iconPosition.x += 2f;
             iconPosition.y -= 1f;
 
+            GUIContent prefabIcon = new GUIContent();
             GUIContent typeIcon = new GUIContent();
             GUIContent customIcon = new GUIContent();
 
@@ -45,9 +50,16 @@ namespace Grendel.Editor
 
             SerializedObject obj = new SerializedObject(gameObject);
 
-            customIcon = EditorGUIUtility.ObjectContent(gameObject, gameObject.GetType());
-            
-            if (typeIcon.image == null)
+            customIcon = new GUIContent(EditorGUIUtility.ObjectContent(gameObject, gameObject.GetType()));
+
+            Component[] components = gameObject.GetComponents<Component>();
+
+            if (components.Length > 1)
+            {
+                typeIcon = new GUIContent(EditorGUIUtility.ObjectContent(null, components[1].GetType()));
+            }
+
+            if (prefabIcon.image == null)
             {
                 PrefabType prefabType = PrefabUtility.GetPrefabType(gameObject);
 
@@ -55,26 +67,26 @@ namespace Grendel.Editor
                 {
                     case PrefabType.None:
 
-                        typeIcon = sGameObjectIcon;
+                        prefabIcon = sGameObjectIcon;
 
                     break;
 
                     case PrefabType.Prefab:
 
-                        typeIcon = sPrefabNormalIcon;
+                        prefabIcon = sPrefabNormalIcon;
 
                     break;
 
                     case PrefabType.PrefabInstance:
 
-                        typeIcon = sPrefabNormalIcon;
+                        prefabIcon = sPrefabNormalIcon;
 
                     break;
 
                     case PrefabType.DisconnectedPrefabInstance:
 
                         GUI.color = Color.Lerp(Color.white, Color.clear, kBrokenPrefabOpacity);
-                        typeIcon = sPrefabNormalIcon;
+                        prefabIcon = sPrefabNormalIcon;
 
                     break;
 
@@ -82,22 +94,29 @@ namespace Grendel.Editor
                     case PrefabType.ModelPrefabInstance:
                     case PrefabType.DisconnectedModelPrefabInstance:
 
-                        typeIcon = sPrefabModelIcon;
+                        prefabIcon = sPrefabModelIcon;
 
                     break;
 
                     case PrefabType.MissingPrefabInstance:
 
                         GUI.color = Color.red;
-                        typeIcon = sPrefabIcon;
+                        prefabIcon = sPrefabIcon;
 
                     break;
                 }                               
             }
 
-            if (typeIcon.image != null && gameObject.transform.childCount == 0)
+            Color previousGUIColor = GUI.color;
+
+            if (!gameObject.activeInHierarchy)
             {
-                GUI.DrawTexture(iconPosition, typeIcon.image);
+                GUI.color = sDisabledIconColor;
+            }
+
+            if (prefabIcon.image != null && gameObject.transform.childCount == 0)
+            {
+                GUI.DrawTexture(iconPosition, prefabIcon.image);
             }
 
             if (customIcon != null)
@@ -111,8 +130,8 @@ namespace Grendel.Editor
 
                 GrendelGUI.ShadedGUILine(rowPosition, Color.gray, Color.white, Vector2.one);
             }
-
-            GUI.color = Color.white;
+                
+            GUI.color = previousGUIColor;            
         }
 
         private static Type TryGetFirstNonTransformComponentType(Component[] components)

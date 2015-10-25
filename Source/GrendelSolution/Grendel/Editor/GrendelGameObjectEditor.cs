@@ -6,7 +6,7 @@ using UnityEditor;
 
 using Grendel.Extensions;
 
-namespace Grendel.Editor
+namespace Grendel.GrendelEditor
 {
     //[InitializeOnLoad]
     //public class GameObjectEditorInitializer
