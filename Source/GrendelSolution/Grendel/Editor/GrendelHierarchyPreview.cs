@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 using UnityEngine;
 using UnityEditor;
@@ -39,6 +40,8 @@ namespace Grendel.Editor
 
             GUIContent typeIcon = new GUIContent();
             GUIContent customIcon = new GUIContent();
+
+            typeIcon = new GUIContent(EditorGUIUtility.ObjectContent(null, TryGetFirstNonTransformComponentType(gameObject.GetComponents<Component>())));
 
             SerializedObject obj = new SerializedObject(gameObject);
 
@@ -110,6 +113,22 @@ namespace Grendel.Editor
             }
 
             GUI.color = Color.white;
+        }
+
+        private static Type TryGetFirstNonTransformComponentType(Component[] components)
+        {
+            if (components.Length <= 1 || components == null)
+            {
+                return typeof(Transform);
+            }
+            else if (components[1] != null)
+            {
+                return components[1].GetType();
+            }
+            else
+            {
+                return typeof(Component); 
+            }
         }
     }
 }

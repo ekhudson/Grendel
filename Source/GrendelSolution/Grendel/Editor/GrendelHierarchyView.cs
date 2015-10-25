@@ -48,7 +48,21 @@ namespace Grendel.Editor
 
         static GrendelHierarchyView()
         {
-            EditorApplication.hierarchyWindowItemOnGUI += OnHierarchyWindowItemOnGUI;
+            SetHierarchyEnabled(GrendelHierarchyPreferences.GrendelHierarchyEnabled);
+        }
+
+        internal static void SetHierarchyEnabled(bool enabled)
+        {
+            if (!enabled)
+            {
+                EditorApplication.hierarchyWindowItemOnGUI -= OnHierarchyWindowItemOnGUI;
+            }
+            else if (enabled)
+            {
+                sCurrentObjectIndex = 0;
+                sTotalCurrentObjectCount = 0;
+                EditorApplication.hierarchyWindowItemOnGUI += OnHierarchyWindowItemOnGUI;
+            }
         }
 
         private static void SetupStyles()
@@ -74,7 +88,7 @@ namespace Grendel.Editor
 
             GameObject gameObject = (GameObject)EditorUtility.InstanceIDToObject(instanceID);
 
-            if (gameObject == null)
+            if (gameObject == null || !GrendelHierarchyPreferences.GrendelHierarchyEnabled)
             {
                 return;
             }
