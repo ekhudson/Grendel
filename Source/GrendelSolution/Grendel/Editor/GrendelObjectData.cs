@@ -12,12 +12,14 @@ namespace Grendel.GrendelEditor
         [SerializeField]private bool mIsHidden = false;
         [SerializeField]private string mNote = string.Empty;
         [SerializeField]private string[] mLabels = new string[0];
+        [SerializeField]private int mPreviewComponentIndex = 1;
         private GameObject mGameObjectReference = null;
 
-        public bool IsLocked        { get { return mIsLocked; } }
-        public bool IsHidden        { get { return mIsHidden; } }
-        public string Note          { get { return mNote; } }
-        public string[] Labels      { get { return mLabels; } }
+        public bool IsLocked                { get { return mIsLocked; } }
+        public bool IsHidden                { get { return mIsHidden; } }
+        public string Note                  { get { return mNote; } }
+        public string[] Labels              { get { return mLabels; } }
+        public int PreviewComponentIndex    { get { return mPreviewComponentIndex; } }
 
         private GameObject GameObjectReference
         {
