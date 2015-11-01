@@ -7,7 +7,7 @@ using UnityEditorInternal;
 
 namespace Grendel.GrendelEditor
 {
-    internal static class GrendelHierarchyPreview
+    internal static class GrendelHierarchyObjectPreview
     {
         private static GUIContent sGameObjectIcon = EditorGUIUtility.IconContent("GameObject Icon");
         private static GUIContent sPrefabIcon = EditorGUIUtility.IconContent("Prefab Icon");
@@ -51,14 +51,8 @@ namespace Grendel.GrendelEditor
             SerializedObject obj = new SerializedObject(gameObject);
 
             customIcon = new GUIContent(EditorGUIUtility.ObjectContent(gameObject, gameObject.GetType()));
-
-            Component[] components = gameObject.GetComponents<Component>();
-
-            if (components.Length > 1)
-            {
-                typeIcon = new GUIContent(EditorGUIUtility.ObjectContent(null, components[1].GetType()));
-            }
-
+            
+            //TODO: This isn't compatible with the main preview anymore, figure out where to put this
             if (prefabIcon.image == null)
             {
                 PrefabType prefabType = PrefabUtility.GetPrefabType(gameObject);
@@ -119,19 +113,28 @@ namespace Grendel.GrendelEditor
                 GUI.DrawTexture(iconPosition, prefabIcon.image);
             }
 
-            if (customIcon != null)
-            {
-                rowPosition.x -= ((GrendelHierarchyView.kIconWidth + GrendelHierarchyView.kIconBufferWidth) * 4) + GrendelHierarchyView.kIconRightMargin + kDividerWidth;
-                GUI.Label(rowPosition, customIcon.image, sCustomIconStyle);
-
-                rowPosition.x = rowPosition.x + (rowPosition.width);
-                rowPosition.y -= 1;
-                rowPosition.width = kDividerWidth;
-
-                GrendelGUI.ShadedGUILine(rowPosition, Color.gray, Color.white, Vector2.one);
-            }
+            DrawTypeIcon(rowPosition, customIcon, typeIcon);
                 
             GUI.color = previousGUIColor;            
+        }
+
+        private static void DrawTypeIcon(Rect position, GUIContent customIcon, GUIContent typeIcon)
+        {
+                bool hasCustomIcon = false;
+
+                hasCustomIcon = (customIcon.image != sGameObjectIcon.image) &&
+                                (customIcon.image != sPrefabIcon.image) &&
+                                (customIcon.image != sPrefabModelIcon.image) &&
+                                (customIcon.image != sPrefabNormalIcon.image);                
+
+                position.x -= ((GrendelHierarchyView.kIconWidth + GrendelHierarchyView.kIconBufferWidth) * 4) + GrendelHierarchyView.kIconRightMargin + kDividerWidth;
+                GUI.Label(position, hasCustomIcon ? customIcon.image : customIcon.image, sCustomIconStyle);
+
+                position.x = position.x + (position.width);
+                position.y -= 1;
+                position.width = kDividerWidth;
+
+                GrendelGUI.ShadedGUILine(position, Color.gray, Color.white, Vector2.one);
         }
 
         private static Type TryGetFirstNonTransformComponentType(Component[] components)

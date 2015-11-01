@@ -3,7 +3,7 @@
 using UnityEngine;
 using UnityEditor;
 
-namespace Grendel.Editor
+namespace Grendel.GrendelEditor
 {
     internal class GrendelHierarchyPreferences
     {
@@ -33,7 +33,7 @@ namespace Grendel.Editor
         private const string kOddRowColorGKey = "GrendelHierarchy_OddRowColorG";
         private const string kOddRowColorBKey = "GrendelHierarchy_OddRowColorB";
         private const string kOddRowColorAKey = "GrendelHierarchy_OddRowColorA";
-        private const Color kOddRowColorDefault = Color.Lerp(Color.magenta, GrendelEditorGUIUtility.CurrentSkinViewColor, 0.95f);
+        private static Color kOddRowColorDefault = Color.Lerp(Color.magenta, GrendelEditorGUIUtility.CurrentSkinViewColor, 0.95f);
 
         internal static Color OddRowColor
         {

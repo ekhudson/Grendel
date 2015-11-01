@@ -172,7 +172,7 @@ namespace Grendel.GrendelEditor
             previewPosition.x -= kIconWidth;
             previewPosition.width = kIconWidth;
 
-            GrendelHierarchyPreview.DrawPreview(gameObject, previewPosition, position);
+            GrendelHierarchyObjectPreview.DrawPreview(gameObject, previewPosition, position);
 
             Rect sideBarPosition = new Rect(position);
             sideBarPosition.width += (sCurrentIndentAmount + 1) * kIndentWidth;
