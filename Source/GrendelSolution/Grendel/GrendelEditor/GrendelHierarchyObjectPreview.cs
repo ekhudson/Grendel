@@ -128,7 +128,7 @@ namespace Grendel.GrendelEditor
                                 (customIcon.image != sPrefabNormalIcon.image);                
 
                 position.x -= ((GrendelHierarchyView.kIconWidth + GrendelHierarchyView.kIconBufferWidth) * 4) + GrendelHierarchyView.kIconRightMargin + kDividerWidth;
-                GUI.Label(position, hasCustomIcon ? customIcon.image : customIcon.image, sCustomIconStyle);
+                GUI.Label(position, hasCustomIcon ? customIcon.image : typeIcon.image, sCustomIconStyle);
 
                 position.x = position.x + (position.width);
                 position.y -= 1;

@@ -16,7 +16,7 @@ namespace Grendel.GrendelEditor
         internal static GrendelLayerPreviewPopupState CurrentPopupState = null;
         internal static LayerSelectPopupWindow sPopupWindow = null;
 
-        private const string kButtonText = ""; //"▼";
+        private const string kButtonText = "";
         private const string kCheckMarkText = "✔";
         private const string kLayerTooltipPretext = "Layer: ";
         private const float kLayerCheckMarkWidth = 16f;
