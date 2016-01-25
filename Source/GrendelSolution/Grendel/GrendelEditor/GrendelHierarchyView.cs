@@ -158,6 +158,14 @@ namespace Grendel.GrendelEditor
                 sCurrentObjectIndex = 0;               
             }
 
+            if (gameObject.GetComponent<GrendelFolderComponent>() != null)
+            {
+                DrawBackground(position, Color.cyan, GrendelFolderBackground.FolderBGTexture);
+                Rect folderRect = new Rect(position);
+                folderRect.width = 16f;
+                GUI.DrawTexture(folderRect, GrendelEditorIcons.FolderEmptyIcon);
+            }
+
             ColorNextRow(position);
 
             //if (gameObject.transform.parent != null)
@@ -229,9 +237,9 @@ namespace Grendel.GrendelEditor
                     DrawBackground(position, sOddRowColor);
                 }
             }
-        }       
+        }
 
-        private static void DrawBackground(Rect position, Color color)
+        private static void DrawBackground(Rect position, Color color, Texture2D texture)
         {
             GUI.color = color;
 
@@ -239,8 +247,13 @@ namespace Grendel.GrendelEditor
             bgRect.x -= ((sCurrentIndentAmount + 1) * kIndentWidth) - 1f;
             bgRect.width += ((sCurrentIndentAmount + 1) * kIndentWidth) - 1f;
 
-            GUI.DrawTexture(bgRect, EditorGUIUtility.whiteTexture);
+            GUI.DrawTexture(bgRect, texture, ScaleMode.StretchToFill);
             GUI.color = Color.white;
+        }
+
+        private static void DrawBackground(Rect position, Color color)
+        {
+            DrawBackground(position, color, EditorGUIUtility.whiteTexture);
         }
 
         private static void DrawLockButton(GameObject gameObject, Rect iconPosition)

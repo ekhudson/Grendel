@@ -9,6 +9,8 @@ namespace Grendel.GrendelEditor
         public static GUIStyle GizmosButtonStyle = GetStyle("GV Gizmo DropDown");
         public static GUIStyle DropDownStyle = GetStyle("DropDown");
         public static GUIStyle SelectionRect = GetStyle("SelectionRect");
+        public static GUIStyle AssetLabelIcon = GetStyle("AssetLabel Icon");
+
 
         private static GUIStyle GetStyle(string name)
         {

@@ -63,6 +63,7 @@
     <Compile Include="GrendelEditor\GrendelEditorGUIUtility.cs" />
     <Compile Include="GrendelEditor\GrendelEditorIcons.cs" />
     <Compile Include="GrendelEditor\GrendelFolderBackground.cs" />
+    <Compile Include="GrendelEditor\GrendelFolderComponent.cs" />
     <Compile Include="GrendelEditor\GrendelGameObjectEditor.cs" />
     <Compile Include="GrendelEditor\GrendelGUI.cs" />
     <Compile Include="GrendelEditor\GrendelHierarchy.cs" />
