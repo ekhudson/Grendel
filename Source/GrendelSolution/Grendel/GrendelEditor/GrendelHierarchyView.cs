@@ -158,12 +158,11 @@ namespace Grendel.GrendelEditor
                 sCurrentObjectIndex = 0;               
             }
 
-            if (gameObject.GetComponent<GrendelFolderComponent>() != null)
+            GrendelFolderComponent folderComponent = gameObject.GetComponent<GrendelFolderComponent>();
+
+            if (folderComponent != null)
             {
-                DrawBackground(position, Color.cyan, GrendelFolderBackground.FolderBGTexture);
-                Rect folderRect = new Rect(position);
-                folderRect.width = 16f;
-                GUI.DrawTexture(folderRect, GrendelEditorIcons.FolderEmptyIcon);
+                GrendelFolder.DrawFolder(position, folderComponent, CurrentRowColor);
             }
 
             ColorNextRow(position);
@@ -180,7 +179,7 @@ namespace Grendel.GrendelEditor
             previewPosition.x -= kIconWidth;
             previewPosition.width = kIconWidth;
 
-            GrendelHierarchyObjectPreview.DrawPreview(gameObject, previewPosition, position);
+            GrendelHierarchyObjectPreview.DrawPreview(gameObject, previewPosition, position, folderComponent == null);
 
             Rect sideBarPosition = new Rect(position);
             sideBarPosition.width += (sCurrentIndentAmount + 1) * kIndentWidth;
@@ -209,7 +208,7 @@ namespace Grendel.GrendelEditor
             sPreviousItemPosition = new Rect(position);
 
             sCurrentObjectIndex++;
-        }
+        }        
 
         private static void DrawSidebar(Rect position)
         {
@@ -239,7 +238,7 @@ namespace Grendel.GrendelEditor
             }
         }
 
-        private static void DrawBackground(Rect position, Color color, Texture2D texture)
+        internal static void DrawBackground(Rect position, Color color, Texture2D texture)
         {
             GUI.color = color;
 
@@ -251,7 +250,7 @@ namespace Grendel.GrendelEditor
             GUI.color = Color.white;
         }
 
-        private static void DrawBackground(Rect position, Color color)
+        internal static void DrawBackground(Rect position, Color color)
         {
             DrawBackground(position, color, EditorGUIUtility.whiteTexture);
         }

@@ -32,7 +32,7 @@ namespace Grendel.GrendelEditor
         //TODO: Look at the first component? Or at least look for some key components
         //like camera, rigidbody, etc.
         //Let the user pick from components on the prefab?
-        internal static void DrawPreview(GameObject gameObject, Rect iconPosition, Rect rowPosition)
+        internal static void DrawPreview(GameObject gameObject, Rect iconPosition, Rect rowPosition, bool drawGameObjectIcon)
         {
             if (sCustomIconStyle == null)
             {
@@ -108,7 +108,7 @@ namespace Grendel.GrendelEditor
                 GUI.color = sDisabledIconColor;
             }
 
-            if (prefabIcon.image != null && gameObject.transform.childCount == 0)
+            if (prefabIcon.image != null && gameObject.transform.childCount == 0 && drawGameObjectIcon)
             {
                 GUI.DrawTexture(iconPosition, prefabIcon.image);
             }

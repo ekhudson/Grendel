@@ -12,10 +12,12 @@ namespace Grendel.GrendelEditor
         public static GrendelPreferencesItem<bool> sComponentPreviewEnabled = new GrendelPreferencesItem<bool>("GRN_ComponentPreviewEnabled", false, "Component Preview", "?");
         public static GrendelPreferencesItem<bool> sBranchViewEnabled = new GrendelPreferencesItem<bool>("GRN_BranchViewEnabled", false, "Branch Preview", "?");
         public static GrendelPreferencesItem<bool> sOddRowColourEnabled = new GrendelPreferencesItem<bool>("GRN_OddRowColourEnabled", false, "Colour Odd Rows", "?");
+        public static GrendelPreferencesItem<bool> sTreeViewEnabled = new GrendelPreferencesItem<bool>("GRN_TreeViewEnabled", true, "Show Hierarchy Tree", "?");
 
         [PreferenceItem("Grendel\nHierarchy")]
         public static void PreferencesGUI()
         {
+            sTreeViewEnabled.BoolValue = EditorGUILayout.ToggleLeft(sTreeViewEnabled.PrefGUIContent, sTreeViewEnabled.BoolValue);
             sOddRowColourEnabled.BoolValue = EditorGUILayout.ToggleLeft(sOddRowColourEnabled.PrefGUIContent, sOddRowColourEnabled.BoolValue);
             sComponentPreviewEnabled.BoolValue = EditorGUILayout.ToggleLeft(sComponentPreviewEnabled.PrefGUIContent, sComponentPreviewEnabled.BoolValue);
             sBranchViewEnabled.BoolValue = EditorGUILayout.ToggleLeft(sBranchViewEnabled.PrefGUIContent, sBranchViewEnabled.BoolValue);
