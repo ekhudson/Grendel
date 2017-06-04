@@ -27,7 +27,7 @@ namespace Grendel.GrendelEditor
 
         internal static void DrawTreeBranch(GameObject gameObject, Rect position, int currentIndentAmount, int previousIndentAmount)
         {
-            if (GrendelHierarchyView.CurrentParentCount <= 0)
+            if (GrendelHierarchyView.CurrentParentCount <= 0 || gameObject == null)
             {
                 return;
             }
@@ -51,8 +51,15 @@ namespace Grendel.GrendelEditor
             }
 
             Color currentTreeColour = parentSelected ? sTreeBranchSelectedColor: STreeBranchNormalColor;
+            Color shadowColor = sTreeBranchShadowColor;
 
-            GrendelGUI.ShadedLabel(position, kTreeItemTop, currentTreeColour, sTreeBranchShadowColor, sTreeViewShadowOffset, sTreeViewStyle);
+            if (EditorApplication.isPlaying || EditorApplication.isPlayingOrWillChangePlaymode)
+            {
+                currentTreeColour *= GrendelEditorGUIUtility.PlaymodeTintColor;
+                shadowColor *= GrendelEditorGUIUtility.PlaymodeTintColor;
+            }
+
+            GrendelGUI.ShadedLabel(position, kTreeItemTop, currentTreeColour, shadowColor, sTreeViewShadowOffset, sTreeViewStyle);
 
             if (previousIndentAmount <= currentIndentAmount && previousIndentAmount > 0 && !(sPreviousItemBranchRect.y > position.y))
             {
@@ -64,7 +71,7 @@ namespace Grendel.GrendelEditor
                 {
                     Rect pos = new Rect(sPreviousItemBranchRect);
                     pos.y -= 1;
-                    GrendelGUI.ShadedLabel(pos, kTreeItemBottom, currentTreeColour, sTreeBranchShadowColor, sTreeViewShadowOffset, sTreeViewStyle);
+                    GrendelGUI.ShadedLabel(pos, kTreeItemBottom, currentTreeColour, shadowColor, sTreeViewShadowOffset, sTreeViewStyle);
                 }
 
             }
@@ -86,6 +93,11 @@ namespace Grendel.GrendelEditor
 
                 Color outerBranchColor = STreeBranchNormalColor;
 
+                if (EditorApplication.isPlayingOrWillChangePlaymode || EditorApplication.isPlaying)
+                {
+                    outerBranchColor *= GrendelEditorGUIUtility.PlaymodeTintColor;
+                }
+
                 if (GrendelHierarchyView.CurrentParents[i] != null)
                 {
                     if ((i - 1 >= 0) && (GrendelHierarchyView.CurrentParents[i - 1].parent != null && (GrendelHierarchyView.CurrentParents[i - 1].GetSiblingIndex() + 1 < GrendelHierarchyView.CurrentParents[i - 1].parent.childCount)))
@@ -97,7 +109,7 @@ namespace Grendel.GrendelEditor
 
                         position.x += 1;
 
-                        GrendelGUI.ShadedLabel(position, kTreeOuterBranch, outerBranchColor, sTreeBranchShadowColor, sTreeViewShadowOffset, sTreeViewStyle);
+                        GrendelGUI.ShadedLabel(position, kTreeOuterBranch, outerBranchColor, shadowColor, sTreeViewShadowOffset, sTreeViewStyle);
                     }
                 }
             }

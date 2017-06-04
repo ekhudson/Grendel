@@ -13,6 +13,7 @@ namespace Grendel.GrendelEditor
         private static GUIStyle sButtonStyle;
         private static GUIStyle sSelectionRectStyle;
         private static string[] sLayerNames = new string[0];
+        private static readonly Vector2 sShadowOffset = new Vector2(2f,2f);
         internal static GrendelLayerPreviewPopupState CurrentPopupState = null;
         internal static LayerSelectPopupWindow sPopupWindow = null;
 
@@ -21,9 +22,9 @@ namespace Grendel.GrendelEditor
         private const string kLayerTooltipPretext = "Layer: ";
         private const float kLayerCheckMarkWidth = 16f;
         private const float kLayerEntryHeight = 18f;
-        private const float kHeightFudge = 1f;        
-
-        internal static void DrawLayerPreview(GameObject obj, Rect iconPosition)
+        private const float kHeightFudge = 1f;
+       
+        internal static void DrawLayerPreview(GrendelObjectData obj, Rect iconPosition)
         {
             if (sLabelStyle == null)
             {
@@ -52,7 +53,7 @@ namespace Grendel.GrendelEditor
                 previewState.IsExpanded = CurrentPopupState.IsExpanded;
             }
 
-            string layerName = LayerMask.LayerToName(obj.layer);
+            string layerName = LayerMask.LayerToName(obj.TrueLayer);
             string shortName = layerName;
 
             if (shortName.Length > 3)
@@ -63,7 +64,7 @@ namespace Grendel.GrendelEditor
             GUIContent labelContent = new GUIContent(shortName, kLayerTooltipPretext + layerName);
 
             Color previousColor = GUI.color;
-            GUI.color = Color.Lerp(GrendelLayerColours.GetLayerColor(obj.layer), GrendelEditorGUIUtility.CurrentSkinViewColor, 0.35f);
+            GUI.color = Color.Lerp(GrendelLayerColours.GetLayerColor(obj.TrueLayer), GrendelEditorGUIUtility.CurrentSkinViewColor, 0.35f);
 
             previewState.IsExpanded = GUI.Toggle(iconPosition, previewState.IsExpanded, kButtonText, sButtonStyle);
 
@@ -132,9 +133,9 @@ namespace Grendel.GrendelEditor
             float windowWidth = 128f;
             float windowHeight = kLayerEntryHeight * (sLayerNames.Length);
             Rect windowPos = new Rect(iconPosition);
-            
-            windowPos.width = windowWidth;
-            windowPos.height = windowHeight;
+
+            windowPos.width = windowWidth + sShadowOffset.x;
+            windowPos.height = windowHeight + sShadowOffset.y;
 
             Vector2 windowCentre = new Vector2(windowPos.x, iconPosition.center.y);
 
@@ -159,7 +160,7 @@ namespace Grendel.GrendelEditor
 
             Event currentEvent = Event.current;
             Rect iconPosition = state.IconPosition;
-            int layer = state.Object.layer;
+            int layer = state.Object.gameObject.layer;
 
             float windowWidth = 128f;           
 
@@ -170,8 +171,21 @@ namespace Grendel.GrendelEditor
 
             int returnLayer = layer;
 
+            //GenericMenu layerMenu = new GenericMenu();
+            //GUIContent tempContent = new GUIContent(string.Empty);
+
+            //for (int i = 0; i < sLayerNames.Length; i++)
+            //{
+            //    tempContent.text = sLayerNames[i];
+            //    bool isOn = layer == i;
+            //    layerMenu.AddItem(tempContent, isOn, SetLayer, i);
+            //}
+
+
+            //layerMenu.ShowAsContext();
+
             GUILayout.BeginVertical();
-          
+
             for (int i = 0; i < sLayerNames.Length; i++)
             {
                 GUILayout.BeginHorizontal(GUILayout.Height(kLayerEntryHeight));
@@ -201,7 +215,7 @@ namespace Grendel.GrendelEditor
                     {
                         GUI.color = Color.gray;
                         GUI.Label(checkmarkRect, kCheckMarkText, EditorStyles.whiteLabel);
-                    }                    
+                    }
 
                     if (currentEvent.type == EventType.MouseDown && currentEvent.button == 0)
                     {
@@ -213,15 +227,24 @@ namespace Grendel.GrendelEditor
                 }
 
                 GUILayout.FlexibleSpace();
-                GUILayout.EndHorizontal();                
+                GUILayout.EndHorizontal();
             }
 
             GUILayout.EndVertical();
 
             GUI.color = Color.white;
 
-            state.Object.layer = returnLayer; //TODO: Undo functionality
-        }  
+            if (returnLayer != state.Object.TrueLayer)
+            {
+                state.Object.gameObject.layer = returnLayer; //TODO: Undo functionality
+                EditorUtility.SetDirty(state.Object);
+            }            
+        }
+
+        private static void SetLayer(object layer)
+        {
+
+        }
     }
 
     internal class LayerSelectPopupWindow : EditorWindow
@@ -242,8 +265,7 @@ namespace Grendel.GrendelEditor
 
         private void OnLostFocus()
         {
-            GrendelHierarchyLayerPreview.CurrentPopupState.IsExpanded = false;
-            
+            GrendelHierarchyLayerPreview.CurrentPopupState.IsExpanded = false;            
             Close();
         }
     }
@@ -252,6 +274,6 @@ namespace Grendel.GrendelEditor
     {
         public bool IsExpanded = false;
         public Rect IconPosition;
-        public GameObject Object = null;
+        public GrendelObjectData Object = null;
     }
 }

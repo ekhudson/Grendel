@@ -83,24 +83,38 @@ namespace Grendel.GrendelEditor
             }
 
             Rect position = new Rect(pos);
-            position.width -= GrendelHierarchyView.kIconWidth;
-            position.x += GrendelHierarchyView.kIconWidth;
-            GrendelHierarchyView.DrawBackground(position, rowColor);
+            int childCount = folder.transform.childCount;
 
-            position.width -= GrendelHierarchyView.kIconWidth;
-            position.x += GrendelHierarchyView.kIconWidth;
-            GrendelHierarchyView.DrawBackground(position, folder.FolderColor, GrendelFolder.FolderBGTexture);
-            
-            position.x -= GrendelHierarchyView.kIconWidth;
+            position.height -= 4f;
+            position.y += 2f;
+
+            GrendelHierarchyView.DrawBackground(position, rowColor, EditorGUIUtility.whiteTexture, false);
+
+            if (childCount > 0)
+            {
+                position.width -= GrendelHierarchyView.kIconWidth;
+                position.x += GrendelHierarchyView.kIconWidth;
+                position.x += GrendelHierarchyView.kIconBufferWidth;
+            }
+
+            GrendelHierarchyView.DrawBackground(position, folder.FolderColor, GrendelFolder.FolderBGTexture, false);
+
+            position.height += 4f;
+            position.y -= 2f;
+
             position.x += GrendelHierarchyView.kIconBufferWidth * 2;
-            position.width += GrendelHierarchyView.kIconWidth;
             GUI.Label(position, folder.transform.name, sLabelStyle);
 
             position.width = GrendelHierarchyView.kIconWidth;
             position.x -= GrendelHierarchyView.kIconWidth;
-            position.x -= GrendelHierarchyView.kIconBufferWidth * 1.5f;
+            position.x -= GrendelHierarchyView.kIconBufferWidth * 2f;
 
-            GUI.DrawTexture(position, folder.transform.childCount > 0 ? GrendelEditorIcons.FolderIcon : GrendelEditorIcons.FolderEmptyIcon);
+            Color previousGUIColor = GUI.color;
+            GUI.color = folder.FolderColor;
+
+            GUI.DrawTexture(position, childCount > 0 ? GrendelEditorIcons.FolderIcon : GrendelEditorIcons.FolderEmptyIcon);
+
+            GUI.color = previousGUIColor;
         }
     }
 }

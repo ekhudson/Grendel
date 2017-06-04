@@ -50,7 +50,7 @@ namespace Grendel.GrendelEditor
             return sLayerColors[layer];
         }
 
-        [PreferenceItem("Grendel")]
+        //[PreferenceItem("Grendel Debug")]
         private static void PreferencesGUI()
         {
             sScrollPos = GUILayout.BeginScrollView(sScrollPos, GUI.skin.box);

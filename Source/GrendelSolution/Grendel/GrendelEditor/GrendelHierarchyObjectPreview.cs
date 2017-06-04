@@ -17,7 +17,6 @@ namespace Grendel.GrendelEditor
         private static GUIStyle sCustomIconStyle = null;
         private static Color sDisabledIconColor = Color.gray;
 
-        private const float kDividerWidth = 1f;
         private const float kBrokenPrefabOpacity = 0.50f;
         private const float kDisabledIconOpacity = 0.50f;
 
@@ -26,7 +25,7 @@ namespace Grendel.GrendelEditor
             sDisabledIconColor.a = kDisabledIconOpacity;
 
             sCustomIconStyle = new GUIStyle(GUI.skin.label);
-            sCustomIconStyle.alignment = TextAnchor.MiddleRight;
+            sCustomIconStyle.alignment = TextAnchor.MiddleCenter;
         }
 
         //TODO: Look at the first component? Or at least look for some key components
@@ -43,14 +42,8 @@ namespace Grendel.GrendelEditor
             iconPosition.y -= 1f;
 
             GUIContent prefabIcon = new GUIContent();
-            GUIContent typeIcon = new GUIContent();
-            GUIContent customIcon = new GUIContent();
-
-            typeIcon = new GUIContent(EditorGUIUtility.ObjectContent(null, TryGetFirstNonTransformComponentType(gameObject.GetComponents<Component>())));
 
             SerializedObject obj = new SerializedObject(gameObject);
-
-            customIcon = new GUIContent(EditorGUIUtility.ObjectContent(gameObject, gameObject.GetType()));
             
             //TODO: This isn't compatible with the main preview anymore, figure out where to put this
             if (prefabIcon.image == null)
@@ -112,29 +105,39 @@ namespace Grendel.GrendelEditor
             {
                 GUI.DrawTexture(iconPosition, prefabIcon.image);
             }
-
-            DrawTypeIcon(rowPosition, customIcon, typeIcon);
                 
             GUI.color = previousGUIColor;            
         }
 
-        private static void DrawTypeIcon(Rect position, GUIContent customIcon, GUIContent typeIcon)
+        internal static void DrawTypeIcon(Rect position, GameObject obj, GrendelFolderComponent folderComponent)
         {
-                bool hasCustomIcon = false;
+            GUIContent customIcon = new GUIContent();
+            GUIContent typeIcon = new GUIContent();
+
+            bool hasCustomIcon = false;
+            Color previousGUIColor = GUI.color;
+
+            customIcon = new GUIContent(EditorGUIUtility.ObjectContent(obj, obj.GetType()));
+
+            if (folderComponent == null)
+            {
+                typeIcon = new GUIContent(EditorGUIUtility.ObjectContent(null, TryGetFirstNonTransformComponentType(obj.GetComponents<Component>())));
 
                 hasCustomIcon = (customIcon.image != sGameObjectIcon.image) &&
                                 (customIcon.image != sPrefabIcon.image) &&
                                 (customIcon.image != sPrefabModelIcon.image) &&
-                                (customIcon.image != sPrefabNormalIcon.image);                
+                                (customIcon.image != sPrefabNormalIcon.image);
+            }
+            else
+            {
+                Color folderColor = folderComponent.FolderColor;
+                folderColor.a = 1f;
+                GUI.color = Color.Lerp(GUI.color, folderColor, folderComponent.FolderColor.a);
+                typeIcon = new GUIContent(GrendelEditorIcons.FolderIcon);
+            }
 
-                position.x -= ((GrendelHierarchyView.kIconWidth + GrendelHierarchyView.kIconBufferWidth) * 4) + GrendelHierarchyView.kIconRightMargin + kDividerWidth;
-                GUI.Label(position, hasCustomIcon ? customIcon.image : typeIcon.image, sCustomIconStyle);
-
-                position.x = position.x + (position.width);
-                position.y -= 1;
-                position.width = kDividerWidth;
-
-                GrendelGUI.ShadedGUILine(position, Color.gray, Color.white, Vector2.one);
+            GUI.Label(position, hasCustomIcon ? customIcon.image : typeIcon.image, sCustomIconStyle);
+            GUI.color = previousGUIColor;
         }
 
         private static Type TryGetFirstNonTransformComponentType(Component[] components)

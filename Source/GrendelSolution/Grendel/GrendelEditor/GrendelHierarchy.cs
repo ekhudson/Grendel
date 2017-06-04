@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
-
+//TODO: I may not actually be using this class anymore
 namespace Grendel.GrendelEditor
 {
     [InitializeOnLoad]
@@ -119,7 +119,7 @@ namespace Grendel.GrendelEditor
             HandleUtility.Repaint();
         }
 
-        [MenuItem("Grendel/Fix Hidden Objects")]
+        //[MenuItem("Grendel/Fix Hidden Objects")]
         private static void FixHiddenObjects()
         {
             GameObject[] objs = GameObject.FindObjectsOfType<GameObject>();

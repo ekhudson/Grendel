@@ -26,15 +26,13 @@ namespace Grendel.GrendelEditor
 
         public override void OnInspectorGUI()
         {
-            base.OnInspectorGUI();
-
             EditorGUI.BeginChangeCheck();
 
-            Target.FolderColor = EditorGUILayout.ColorField("Folder Color", Target.FolderColor);
+            base.OnInspectorGUI();
 
             if (EditorGUI.EndChangeCheck())
             {
-                EditorUtility.SetDirty(target);
+                EditorUtility.SetDirty(Target);
                 EditorApplication.RepaintHierarchyWindow();
             }
         }
